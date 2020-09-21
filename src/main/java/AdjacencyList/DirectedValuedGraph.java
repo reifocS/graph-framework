@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import GraphAlgorithms.GraphTools;
 import Nodes.DirectedNode;
 
-public class DirectedValuedGraph extends DirectedGraph<DirectedNode> {
+public class DirectedValuedGraph extends DirectedGraph {
 
 	//--------------------------------------------------
     // 				Constructors
@@ -14,7 +14,7 @@ public class DirectedValuedGraph extends DirectedGraph<DirectedNode> {
 	public DirectedValuedGraph(int[][] matrixVal) {
     	super();
     	this.order = matrixVal.length;
-        this.nodes = new ArrayList<>();
+        this.nodes = new ArrayList<DirectedNode>();
         for (int i = 0; i < this.order; i++) {
             this.nodes.add(i, this.makeNode(i));
         }

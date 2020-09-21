@@ -51,7 +51,7 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
      * removes the arc (from,to) if there exists at least one between these nodes in the graph. And if there remains no arc, removes the cost.
      */
 	@Override
-	public void removeArc(AbstractNode from, AbstractNode to) {
+	public void removeArc(DirectedNode from, DirectedNode to) {
 		super.removeArc(from, to);
 		// A completer
 	}
@@ -59,7 +59,7 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 	/**
      * adds the arc (from,to,cost), we allow the multi-graph. If there is already one initial cost, we keep it.
      */
-	public void addArc(AbstractNode from, AbstractNode to, int cost ) {
+	public void addArc(DirectedNode from, DirectedNode to, int cost ) {
 		super.addArc(from,to);
 		// A completer
 	}

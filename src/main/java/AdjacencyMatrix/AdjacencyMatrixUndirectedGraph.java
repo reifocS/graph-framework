@@ -66,7 +66,7 @@ public class AdjacencyMatrixUndirectedGraph extends AbstractMatrixGraph<Undirect
 	// ------------------------------------------------		
 	
 	@Override
-	public boolean isEdge(AbstractNode x, AbstractNode y) {
+	public boolean isEdge(UndirectedNode x, UndirectedNode y) {
 		// A completer
 		return true;		
 	}
@@ -75,7 +75,7 @@ public class AdjacencyMatrixUndirectedGraph extends AbstractMatrixGraph<Undirect
      * removes the edge (x,y) if there exists at least one between these nodes in the graph.
      */
 	@Override
-	public void removeEdge(AbstractNode x, AbstractNode y) {
+	public void removeEdge(UndirectedNode x, UndirectedNode y) {
 		// A completer
 	}
 
@@ -83,7 +83,7 @@ public class AdjacencyMatrixUndirectedGraph extends AbstractMatrixGraph<Undirect
      * adds the edge (x,y), we allow the multi-graph.
      */
 	@Override
-	public void addEdge(AbstractNode x, AbstractNode y) {
+	public void addEdge(UndirectedNode x, UndirectedNode y) {
 		// A completer
 	}
 
@@ -118,6 +118,12 @@ public class AdjacencyMatrixUndirectedGraph extends AbstractMatrixGraph<Undirect
 		for (Integer integer : t2) {
 			System.out.print(integer + ", ");
 		}
+		am.isEdge(new UndirectedNode(2), new UndirectedNode(5));
+		for(int i = 0; i<3;i++)
+			am.addEdge(new UndirectedNode(2), new UndirectedNode(5));
+		System.out.println(am);
+		am.removeEdge(new UndirectedNode(2), new UndirectedNode(5));
+		System.out.println(am);
 		// A completer
 	}
 }

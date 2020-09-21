@@ -8,7 +8,7 @@ import GraphAlgorithms.GraphTools;
 import Nodes.DirectedNode;
 import Abstraction.IDirectedGraph;
 
-public class DirectedGraph<A extends DirectedNode> extends AbstractListGraph<A> implements IDirectedGraph<A> {
+public class DirectedGraph extends AbstractListGraph<DirectedNode> implements IDirectedGraph {
 
 	private static int _DEBBUG =0;
 		
@@ -18,18 +18,18 @@ public class DirectedGraph<A extends DirectedNode> extends AbstractListGraph<A> 
 
 	public DirectedGraph(){
 		super();
-		this.nodes = new ArrayList<A>();
+		this.nodes = new ArrayList<DirectedNode>();
 	}
 
     public DirectedGraph(int[][] matrix) {
         this.order = matrix.length;
-        this.nodes = new ArrayList<A>();
+        this.nodes = new ArrayList<DirectedNode>();
         for (int i = 0; i < this.order; i++) {
             this.nodes.add(i, this.makeNode(i));
         }
-        for (A n : this.getNodes()) {
+        for (DirectedNode n : this.getNodes()) {
             for (int j = 0; j < matrix[n.getLabel()].length; j++) {
-                A nn = this.getNodes().get(j);
+            	DirectedNode nn = this.getNodes().get(j);
                 if (matrix[n.getLabel()][j] != 0) {
                     n.getSuccs().put(nn,0);
                     nn.getPreds().put(n,0);
@@ -39,16 +39,16 @@ public class DirectedGraph<A extends DirectedNode> extends AbstractListGraph<A> 
         }
     }
 
-    public DirectedGraph(DirectedGraph<A> g) {
+    public DirectedGraph(DirectedGraph g) {
         super();
         this.nodes = new ArrayList<>();
         this.order = g.getNbNodes();
         this.m = g.getNbArcs();
-        for(A n : g.getNodes()) {
+        for(DirectedNode n : g.getNodes()) {
             this.nodes.add(makeNode(n.getLabel()));
         }
-        for (A n : g.getNodes()) {
-            A nn = this.getNodes().get(n.getLabel());
+        for (DirectedNode n : g.getNodes()) {
+        	DirectedNode nn = this.getNodes().get(n.getLabel());
             for (DirectedNode sn : n.getSuccs().keySet()) {
                 DirectedNode snn = this.getNodes().get(sn.getLabel());
                 nn.getSuccs().put(snn,0);
@@ -68,18 +68,18 @@ public class DirectedGraph<A extends DirectedNode> extends AbstractListGraph<A> 
     }
 
     @Override
-    public boolean isArc(A from, A to) {
+    public boolean isArc(DirectedNode from, DirectedNode to) {
     	// A completer
     	return false;
     }
 
     @Override
-    public void removeArc(A from, A to) {
+    public void removeArc(DirectedNode from, DirectedNode to) {
     	// A completer
     }
 
     @Override
-    public void addArc(A from, A to) {
+    public void addArc(DirectedNode from, DirectedNode to) {
     	// A completer
     }
 
@@ -93,14 +93,14 @@ public class DirectedGraph<A extends DirectedNode> extends AbstractListGraph<A> 
      * @return a node typed by A extends DirectedNode
      */
     @Override
-    public A makeNode(int label) {
-        return (A)new DirectedNode(label);
+    public DirectedNode makeNode(int label) {
+        return new DirectedNode(label);
     }
 
     /**
      * @return the corresponding nodes in the list this.nodes
      */
-    public A getNodeOfList(A src) {
+    public DirectedNode getNodeOfList(DirectedNode src) {
         return this.getNodes().get(src.getLabel());
     }
 
@@ -121,7 +121,7 @@ public class DirectedGraph<A extends DirectedNode> extends AbstractListGraph<A> 
 
     @Override
     public IDirectedGraph computeInverse() {
-        DirectedGraph<A> g = new DirectedGraph<>(this);
+        DirectedGraph g = new DirectedGraph(this);
         // A completer
         return g;
     }

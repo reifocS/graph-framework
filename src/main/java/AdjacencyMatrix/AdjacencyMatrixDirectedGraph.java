@@ -34,7 +34,7 @@ public class AdjacencyMatrixDirectedGraph extends AbstractMatrixGraph<DirectedNo
 		}
 	}
 
-	public AdjacencyMatrixDirectedGraph(IDirectedGraph<DirectedNode> g) {
+	public AdjacencyMatrixDirectedGraph(IDirectedGraph g) {
 		this.order = g.getNbNodes();
 		this.m = g.getNbArcs();
 		this.matrix = g.toAdjacencyMatrix();
@@ -49,7 +49,7 @@ public class AdjacencyMatrixDirectedGraph extends AbstractMatrixGraph<DirectedNo
 		return this.m;
 	}
 
-	public List<Integer> getSuccessors(AbstractNode x) {
+	public List<Integer> getSuccessors(DirectedNode x) {
 		List<Integer> v = new ArrayList<Integer>();
 		for(int i =0;i<this.matrix[x.getLabel()].length;i++){
 			if(this.matrix[x.getLabel()][i]>0){
@@ -59,7 +59,7 @@ public class AdjacencyMatrixDirectedGraph extends AbstractMatrixGraph<DirectedNo
 		return v;
 	}
 
-	public List<Integer> getPredecessors(AbstractNode x) {
+	public List<Integer> getPredecessors(DirectedNode x) {
 		List<Integer> v = new ArrayList<Integer>();
 		for(int i =0;i<this.matrix.length;i++){
 			if(this.matrix[i][x.getLabel()]>0){
@@ -75,7 +75,7 @@ public class AdjacencyMatrixDirectedGraph extends AbstractMatrixGraph<DirectedNo
 	// ------------------------------------------------		
 	
 	@Override
-	public boolean isArc(AbstractNode from, AbstractNode to) {
+	public boolean isArc(DirectedNode from, DirectedNode to) {
 		// A completer
 		return true;
 	}
@@ -84,7 +84,7 @@ public class AdjacencyMatrixDirectedGraph extends AbstractMatrixGraph<DirectedNo
 	 * removes the arc (from,to) if there exists at least one between these nodes in the graph.
 	 */
 	@Override
-	public void removeArc(AbstractNode from, AbstractNode to) {
+	public void removeArc(DirectedNode from, DirectedNode to) {
 		// A completer
 	}
 
@@ -92,7 +92,7 @@ public class AdjacencyMatrixDirectedGraph extends AbstractMatrixGraph<DirectedNo
 	 * Adds the arc (from,to). we allow multiple graph.
 	 */
 	@Override
-	public void addArc(AbstractNode from, AbstractNode to) {
+	public void addArc(DirectedNode from, DirectedNode to) {
 		// A completer
 	}
 
@@ -105,9 +105,17 @@ public class AdjacencyMatrixDirectedGraph extends AbstractMatrixGraph<DirectedNo
 	}
 
 	@Override
-	public IDirectedGraph<DirectedNode> computeInverse() {
+	public IDirectedGraph computeInverse() {
+		AdjacencyMatrixDirectedGraph am = new AdjacencyMatrixDirectedGraph(this.matrix);
+		for(int i=0; i<this.order; i++) {
+			for(int j=i+1; j<this.order; j++) {
+				int tmp = am.matrix[i][j];
+				am.matrix[i][j] = am.matrix[j][i];
+				am.matrix[j][i] = tmp;
+			}
+		}
 		// A completer
-		return null;
+		return am;
 	}
 
 	@Override

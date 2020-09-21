@@ -48,7 +48,7 @@ public class GraphToolsList  extends GraphTools {
 	public static void main(String[] args) {
 		int[][] Matrix = GraphTools.generateGraphData(10, 20, false, false, true, 100001);
 		GraphTools.afficherMatrix(Matrix);
-		DirectedGraph<DirectedNode> al = new DirectedGraph<>(Matrix);
+		DirectedGraph al = new DirectedGraph(Matrix);
 		System.out.println(al);
 
 		// A completer

@@ -54,7 +54,7 @@ public class AdjacencyMatrixUndirectedValuedGraph extends AdjacencyMatrixUndirec
      * removes the edge (x,y) if there exists at least one between these nodes in the graph. And if there remains no arc, removes the cost.
      */
 	@Override
-	public void removeEdge(AbstractNode x, AbstractNode y) {
+	public void removeEdge(UndirectedNode x, UndirectedNode y) {
 		super.removeEdge(x, y);
 		// A completer
 	}
@@ -62,7 +62,7 @@ public class AdjacencyMatrixUndirectedValuedGraph extends AdjacencyMatrixUndirec
 	/**
      * adds the edge (x,y,cost), we allow the multi-graph. If there is already one initial cost, we keep it.
      */
-	public void addEdge(AbstractNode x, AbstractNode y, int cost ) {
+	public void addEdge(UndirectedNode x, UndirectedNode y, int cost ) {
 		super.addEdge(x,y);
 		// A completer
 	}

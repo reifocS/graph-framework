@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import GraphAlgorithms.GraphTools;
 import Nodes.UndirectedNode;
 
-public class UndirectedValuedGraph extends UndirectedGraph<UndirectedNode> {
+public class UndirectedValuedGraph extends UndirectedGraph{
 
 	//--------------------------------------------------
     // 				Constructors

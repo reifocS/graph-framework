@@ -5,14 +5,15 @@ import java.util.List;
 
 import Collection.Triple;
 import Nodes.DirectedNode;
+import Nodes.UndirectedNode;
 
-public class BinaryHeapEdge<A> {
+public class BinaryHeapEdge {
 
 	/**
 	 * A list structure for a faster management of the heap by indexing
 	 * 
 	 */
-	private  List<Triple<A,A,Integer>> binh;
+	private  List<Triple<UndirectedNode,UndirectedNode,Integer>> binh;
 
     public BinaryHeapEdge() {
         this.binh = new ArrayList<>();
@@ -29,7 +30,7 @@ public class BinaryHeapEdge<A> {
 	 * @param to one node of the edge
 	 * @param val the edge weight
 	 */
-    public void insert(A from, A to, int val) {
+    public void insert(UndirectedNode from, UndirectedNode to, int val) {
     	// To complete
     }
 
@@ -40,7 +41,7 @@ public class BinaryHeapEdge<A> {
 	 * @return the edge with the minimal value (root of the binary heap)
 	 * 
 	 */
-    public Triple<A,A,Integer> remove() {
+    public Triple<UndirectedNode,UndirectedNode,Integer> remove() {
     	// To complete
     	return null;
         
@@ -76,7 +77,7 @@ public class BinaryHeapEdge<A> {
 	 * @param child an index of the list edges
 	 */
     private void swap(int father, int child) {         
-    	Triple<A,A,Integer> temp = new Triple<>(binh.get(father).getFirst(), binh.get(father).getSecond(), binh.get(father).getThird());
+    	Triple<UndirectedNode,UndirectedNode,Integer> temp = new Triple<>(binh.get(father).getFirst(), binh.get(father).getSecond(), binh.get(father).getThird());
     	binh.get(father).setTriple(binh.get(child));
     	binh.get(child).setTriple(temp);
     }
@@ -89,7 +90,7 @@ public class BinaryHeapEdge<A> {
 	 */
     public String toString() {
         StringBuilder s = new StringBuilder();
-        for (Triple<A,A,Integer> no: binh) {
+        for (Triple<UndirectedNode,UndirectedNode,Integer> no: binh) {
             s.append(no).append(", ");
         }
         return s.toString();
@@ -159,7 +160,7 @@ public class BinaryHeapEdge<A> {
     }
 
     public static void main(String[] args) {
-        BinaryHeapEdge<DirectedNode> jarjarBin = new BinaryHeapEdge<>();
+        BinaryHeapEdge jarjarBin = new BinaryHeapEdge();
         System.out.println(jarjarBin.isEmpty()+"\n");
         int k = 10;
         int m = k;
@@ -167,7 +168,7 @@ public class BinaryHeapEdge<A> {
         int max = 20;
         while (k > 0) {
             int rand = min + (int) (Math.random() * ((max - min) + 1));                        
-            jarjarBin.insert(new DirectedNode(k), new DirectedNode(k+30), rand);            
+            jarjarBin.insert(new UndirectedNode(k), new UndirectedNode(k+30), rand);            
             k--;
         }
         // A completer
