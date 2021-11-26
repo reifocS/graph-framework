@@ -12,8 +12,8 @@ public abstract class AbstractListGraph<A extends AbstractNode> implements IGrap
 	// --------------------------------------------------
 
 	protected List<A> nodes;
-	protected int order;
-	protected int m;
+	protected int order; // Number of vertices
+	protected int m; // Number of edges/arcs
 
 	// --------------------------------------------------
 	// Constructors
@@ -52,7 +52,7 @@ public abstract class AbstractListGraph<A extends AbstractNode> implements IGrap
 
 	/**
 	 * Method to generify node creation
-	 * 
+	 *
 	 * @param label of a node
 	 * @return a node typed by A
 	 */

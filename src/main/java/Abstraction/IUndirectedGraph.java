@@ -1,6 +1,5 @@
 package Abstraction;
 
-import Nodes.AbstractNode;
 import Nodes.UndirectedNode;
 
 public interface IUndirectedGraph extends IGraph {
