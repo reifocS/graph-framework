@@ -1,13 +1,13 @@
 package AdjacencyList;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import Abstraction.AbstractListGraph;
 import Abstraction.IDirectedGraph;
 import GraphAlgorithms.GraphTools;
 import Nodes.DirectedNode;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 //TODO
 //1) compléter ces méthodes et celles de directedValuedGraph
@@ -23,7 +23,7 @@ public class DirectedGraph extends AbstractListGraph<DirectedNode> implements ID
 
 	public DirectedGraph() {
 		super();
-		this.nodes = new ArrayList<>();
+		this.nodes = new ArrayList<DirectedNode>();
 	}
 
 	public DirectedGraph(int[][] matrix) {
@@ -74,19 +74,33 @@ public class DirectedGraph extends AbstractListGraph<DirectedNode> implements ID
 
 	@Override
 	public boolean isArc(DirectedNode from, DirectedNode to) {
-		return from.getSuccs().containsValue(to);
+		DirectedNode xElement = this.getNodeOfList(from);
+		DirectedNode yElement = this.getNodeOfList(to);
+		return xElement.getNbSuccs() > 0 && yElement.getNbPreds() > 0 && xElement.getSuccs().containsKey(yElement)
+				&& yElement.getPreds().containsKey(xElement);
+
 	}
 
 	@Override
 	public void removeArc(DirectedNode from, DirectedNode to) {
-		from.getSuccs().remove(to);
-		to.getPreds().remove(from);
+		if (isArc(from, to)) {
+			DirectedNode xElement = this.getNodeOfList(from);
+			DirectedNode yElement = this.getNodeOfList(to);
+			xElement.getSuccs().remove(yElement);
+			yElement.getPreds().remove(xElement);
+			this.m--;
+		}
 	}
 
 	@Override
 	public void addArc(DirectedNode from, DirectedNode to) {
-		from.getSuccs().put(to, 0);
-		to.getPreds().put(from, 0);
+		if (!isArc(from, to)) {
+			DirectedNode xElement = this.getNodeOfList(from);
+			DirectedNode yElement = this.getNodeOfList(to);
+			xElement.getSuccs().put(yElement, 0);
+			yElement.getPreds().put(xElement, 0);
+			this.m++;
+		}
 	}
 
 	// --------------------------------------------------
@@ -95,7 +109,7 @@ public class DirectedGraph extends AbstractListGraph<DirectedNode> implements ID
 
 	/**
 	 * Method to generify node creation
-	 *
+	 * 
 	 * @param label of a node
 	 * @return a node typed by A extends DirectedNode
 	 */
@@ -126,6 +140,10 @@ public class DirectedGraph extends AbstractListGraph<DirectedNode> implements ID
 		return matrix;
 	}
 
+	/**
+	 * @return the associated inverted directed graph, i.e : edge => no edge no edge
+	 *         => edge
+	 */
 	@Override
 	public IDirectedGraph computeInverse() {
 		DirectedGraph g = new DirectedGraph(this);
@@ -138,6 +156,19 @@ public class DirectedGraph extends AbstractListGraph<DirectedNode> implements ID
 		}
 		// A completer
 		return g;
+	}
+
+	public IDirectedGraph computeInverse2() {
+		int[][] matrixI = new int[order][order];
+		int[][] matrix = this.toAdjacencyMatrix();
+		for (int i = 0; i < matrix.length; i++) {
+			int[] n = matrix[i];
+			for (int j = 0; j < n.length; j++) {
+				int k = n[j];
+				matrixI[i][j] = (k == 0 ? 1 : 0);
+			}
+		}
+		return new DirectedGraph(matrixI);
 	}
 
 	@Override
@@ -156,13 +187,31 @@ public class DirectedGraph extends AbstractListGraph<DirectedNode> implements ID
 
 	public static void main(String[] args) {
 		int[][] Matrix = GraphTools.generateGraphData(10, 20, false, false, false, 100001);
-		GraphTools.afficherMatrix(Matrix);
 		DirectedGraph al = new DirectedGraph(Matrix);
 		System.out.println(al);
+		GraphTools.afficherMatrix(al.toAdjacencyMatrix());
+		// A completer
 		al.addArc(al.getNodeOfList(al.makeNode(0)), al.getNodeOfList(al.makeNode(5)));
 		System.out.println(al);
 		al.removeArc(al.getNodeOfList(al.makeNode(0)), al.getNodeOfList(al.makeNode(5)));
 		System.out.println(al);
-		// A completer
+		GraphTools.afficherMatrix(Matrix);
+
+		DirectedGraph alI = (DirectedGraph) al.computeInverse();
+		System.out.println(al);
+		GraphTools.afficherMatrix(alI.toAdjacencyMatrix());
+
+		System.out.println(al.toString());
+		System.out.println(al.getNbArcs());
+		DirectedNode xElement = new DirectedNode(5);
+		DirectedNode yElement = new DirectedNode(15);
+		if (al.isArc(xElement, yElement)) {
+			al.removeArc(xElement, yElement);
+		} else {
+			al.addArc(xElement, yElement);
+		}
+		GraphTools.afficherMatrix(al.toAdjacencyMatrix());
+		System.out.println(al.toString());
+		System.out.println(al.getNbArcs());
 	}
 }
