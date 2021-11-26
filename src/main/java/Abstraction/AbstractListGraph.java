@@ -58,4 +58,9 @@ public abstract class AbstractListGraph<A extends AbstractNode> implements IGrap
 	 */
 	public abstract A makeNode(int label);
 
+	@Override
+	public boolean isIncluded(AbstractNode node) {
+		return node.getLabel() < nodes.size();
+	}
+
 }

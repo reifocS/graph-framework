@@ -41,4 +41,8 @@ public abstract class AbstractMatrixGraph<A extends AbstractNode> implements IGr
 		return this.order;
 	}
 
+	@Override
+	public boolean isIncluded(AbstractNode node) {
+		return node.getLabel() < matrix.length;
+	}
 }
