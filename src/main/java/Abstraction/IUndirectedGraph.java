@@ -7,7 +7,7 @@ public interface IUndirectedGraph extends IGraph {
 
 	/**
 	 * @return the number of edges in the graph
- 	 */
+	 */
 	int getNbEdges();
 
 	/**
@@ -17,12 +17,12 @@ public interface IUndirectedGraph extends IGraph {
 
 	/**
 	 * Removes edge (x,y) if there exists one
-     */
+	 */
 	void removeEdge(UndirectedNode x, UndirectedNode y);
 
 	/**
 	 * Adds edge (x,y), requires that nodes x and y already exist
-     */
+	 */
 	void addEdge(UndirectedNode x, UndirectedNode y);
 
 }

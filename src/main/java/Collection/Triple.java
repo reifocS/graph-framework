@@ -1,13 +1,13 @@
 package Collection;
 
 public class Triple<A, B, C> {
-	private  A first;
-	private  B second;
+	private A first;
+	private B second;
 	private C third;
 
 	public Triple(A left, B middle, C right) {
 		this.first = left;
-		this.second= middle;
+		this.second = middle;
 		this.third = right;
 	}
 
@@ -35,7 +35,7 @@ public class Triple<A, B, C> {
 		this.third = val;
 	}
 
-	public void setTriple(Triple<A,B,C> t) {
+	public void setTriple(Triple<A, B, C> t) {
 		this.first = t.getFirst();
 		this.second = t.getSecond();
 		this.third = t.getThird();
@@ -52,14 +52,13 @@ public class Triple<A, B, C> {
 			return false;
 		}
 		Triple triplo = (Triple) o;
-		return this.first.equals(triplo.getFirst())
-			&& this.second.equals(triplo.getSecond())
-			&& this.third.equals(triplo.getThird());
+		return this.first.equals(triplo.getFirst()) && this.second.equals(triplo.getSecond())
+				&& this.third.equals(triplo.getThird());
 	}
 
 	@Override
-	public String toString(){
-		return "<"+first+","+second+","+third+">";
+	public String toString() {
+		return "<" + first + "," + second + "," + third + ">";
 	}
 
 }

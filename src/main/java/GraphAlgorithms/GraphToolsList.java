@@ -14,36 +14,33 @@ import Collection.Triple;
 import Nodes.DirectedNode;
 import Nodes.UndirectedNode;
 
-public class GraphToolsList  extends GraphTools {
+public class GraphToolsList extends GraphTools {
 
-	private static int _DEBBUG =0;
+	private static int _DEBBUG = 0;
 
 	private static int[] visite;
 	private static int[] debut;
 	private static int[] fin;
 	private static List<Integer> order_CC;
-	private static int cpt=0;
+	private static int cpt = 0;
 
-	//--------------------------------------------------
-	// 				Constructors
-	//--------------------------------------------------
+	// --------------------------------------------------
+	// Constructors
+	// --------------------------------------------------
 
-	public GraphToolsList(){
+	public GraphToolsList() {
 		super();
 	}
 
 	// ------------------------------------------
-	// 				Accessors
+	// Accessors
 	// ------------------------------------------
 
-
-
 	// ------------------------------------------
-	// 				Methods
+	// Methods
 	// ------------------------------------------
 
 	// A completer
-
 
 	public static void main(String[] args) {
 		int[][] Matrix = GraphTools.generateGraphData(10, 20, false, false, true, 100001);
