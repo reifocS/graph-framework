@@ -1,26 +1,30 @@
 package GraphAlgorithms;
 
+import Abstraction.IDirectedGraph;
+import AdjacencyList.DirectedGraph;
 import AdjacencyList.DirectedValuedGraph;
 import AdjacencyList.UndirectedValuedGraph;
 import Collection.Triple;
 import Nodes.DirectedNode;
 import Nodes.UndirectedNode;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class GraphTools {
 
     private static int _DEBBUG = 0;
     private static int INF = Integer.MAX_VALUE;
+    private static int compt = 0;
 
     public GraphTools() {
 
     }
 
 
+
+    // TODO
     public List<Triple<UndirectedNode, UndirectedNode, Integer>> prim(UndirectedValuedGraph undirectedGraph) {
         List edges = new ArrayList();
         List visitedNodes = new ArrayList();
@@ -28,7 +32,7 @@ public class GraphTools {
         List<UndirectedNode> nodes = undirectedGraph.getNodes();
         primIteration(nodes.get(0), edges, binaryHeapEdge);
         visitedNodes.add(nodes.get(0));
-        return new ArrayList<>();
+        return edges;
     }
 
 
@@ -38,6 +42,7 @@ public class GraphTools {
             binaryHeapEdge.insert(triple.getFirst(), triple.getSecond(), triple.getThird());
         }
     }
+
 
     private List<Triple<UndirectedNode, UndirectedNode, Integer>> getAllAdjacent(UndirectedNode undirectedNode) {
         ArrayList<Triple<UndirectedNode, UndirectedNode, Integer>> adj = new ArrayList<>();
@@ -256,6 +261,96 @@ public class GraphTools {
     }
 
 
+    public static List<DirectedNode> explorerSommet(DirectedNode sommet, Set<DirectedNode> nodeSet, int[] visite, int[] debut, int[] fin) {
+        nodeSet.add(sommet);
+        visite[sommet.getLabel()] = 1;
+        debut[sommet.getLabel()] = compt++;
+        List<DirectedNode> directedNodes = new ArrayList<>();
+        directedNodes.add(sommet);
+        for (DirectedNode voisin : sommet.getSuccs().keySet()) {
+            if (!nodeSet.contains(voisin)) {
+                directedNodes.addAll(explorerSommet(voisin, nodeSet, visite, debut, fin));
+            }
+        }
+        visite[sommet.getLabel()] = 2;
+        fin[sommet.getLabel()] = compt++;
+        return directedNodes;
+    }
+
+    //Depth First Search
+    public static int[][] explorerGraphe(DirectedGraph graph, List<DirectedNode> nodeList) {
+        Set<DirectedNode> nodes = new HashSet<>();
+        int[] visite = new int[graph.getNbNodes()];
+        int[] debut = new int[graph.getNbNodes()];
+        int[] fin = new int[graph.getNbNodes()];
+        compt = 0;
+        for (DirectedNode directedNode : nodeList) {
+            if (!nodes.contains(directedNode)) {
+                System.out.println(explorerSommet(directedNode, nodes, visite, debut, fin));
+
+            }
+        }
+        return new int[][]{debut, fin, visite};
+    }
+
+    public static void BFS(DirectedNode node) {
+        Set<DirectedNode> marked = new HashSet<>();
+        LinkedList<DirectedNode> toVisit = new LinkedList<>();
+        toVisit.add(node);
+        marked.add(node);
+        while (!toVisit.isEmpty()) {
+            DirectedNode n = toVisit.removeFirst();
+            for (DirectedNode dn : n.getSuccs().keySet()) {
+                if (!marked.contains(dn)) {
+                    marked.add(dn);
+                    toVisit.add(dn);
+                }
+            }
+        }
+    }
+
+
+    private static boolean areAllTrue(boolean[] array) {
+        for (boolean b : array) if (!b) return false;
+        return true;
+    }
+
+    public static int[] dijkstra(DirectedValuedGraph directedValuedGraph, DirectedNode node) {
+        int n = directedValuedGraph.getNbNodes();
+
+        int[] d = new int[n];
+        int[] pred = new int[n];
+        boolean[] b = new boolean[n];
+        for (int i = 0; i < n; ++i) {
+            d[i] = INF;
+            b[i] = false;
+        }
+        d[node.getLabel()] = 0;
+        while (!areAllTrue(b)) {
+            int min = INF;
+            DirectedNode s = null;
+            for (DirectedNode no : directedValuedGraph.getNodes()) {
+                if (!b[no.getLabel()] && d[no.getLabel()] < min) {
+                    min = d[no.getLabel()];
+                    s = no;
+                }
+            }
+            if (min < INF) {
+                assert s != null;
+                b[s.getLabel()] = true;
+                for (DirectedNode s2 : s.getSuccs().keySet()) {
+                    if (d[s2.getLabel()] > d[s.getLabel()] + s.getSuccs().get(s2)) {
+                        d[s2.getLabel()] = d[s.getLabel()] + s.getSuccs().get(s2);
+                        pred[s2.getLabel()] = s.getLabel();
+                    }
+                }
+            } else {
+                return d;
+            }
+        }
+        return d;
+    }
+
     public static int[][] bellman(DirectedValuedGraph graph, DirectedNode s) {
         int n = graph.getNbNodes();
         int[][] dist = new int[n][n];
@@ -280,15 +375,26 @@ public class GraphTools {
         return dist;
     }
 
+
+    public static void CFC(DirectedGraph g) {
+        int[] fin = explorerGraphe(g, g.getNodes())[1];
+        DirectedGraph inverse = g.computeInverse();
+        TreeMap<Integer,Integer> map = new TreeMap();
+        for( int i = 0; i < fin.length; ++i ) {
+            map.put( fin[i], i );
+        }
+        List<Integer> finDécroissant = map.values().stream().collect(Collectors.toList());
+        Collections.reverse(finDécroissant);
+        List<DirectedNode> nodesInverse = finDécroissant.stream().map(i -> inverse.getNodeOfList(inverse.makeNode(i))).collect(Collectors.toList());
+        System.out.println("CFC");
+        explorerGraphe(inverse, nodesInverse);
+    }
+
     public static void main(String[] args) {
-        int[][] mat = generateGraphData(10, 20, false, false, false, 100001);
+        int[][] mat = generateGraphData(7, 10, false, false, false, 13);
         afficherMatrix(mat);
-        int[][] mat2 = generateGraphData(10, 20, false, false, false, 100002);
-        afficherMatrix(mat2);
-        int[][] mat3 = generateGraphData(10, 20, false, true, true, 100003);
-        afficherMatrix(mat3);
-        int[][] matVal = generateValuedGraphData(10, false, false, true, true, 100007);
-        afficherMatrix(matVal);
+        DirectedGraph g = new DirectedGraph(mat);;
+        CFC(g);
 
     }
 
