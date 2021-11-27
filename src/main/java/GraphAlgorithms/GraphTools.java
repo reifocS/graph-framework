@@ -1,6 +1,5 @@
 package GraphAlgorithms;
 
-import Abstraction.IDirectedGraph;
 import AdjacencyList.DirectedGraph;
 import AdjacencyList.DirectedValuedGraph;
 import AdjacencyList.UndirectedValuedGraph;
@@ -10,7 +9,6 @@ import Nodes.UndirectedNode;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class GraphTools {
 
@@ -21,7 +19,6 @@ public class GraphTools {
 	public GraphTools() {
 
 	}
-
 
 
     // TODO
@@ -276,7 +273,7 @@ public class GraphTools {
     }
 
     //Depth First Search
-    public static int[][] explorerGraphe(DirectedGraph graph, List<DirectedNode> nodeList) {
+    public static int[][] explorerGraphe(DirectedGraph graph, List<DirectedNode> nodeList, boolean displayCFC) {
         Set<DirectedNode> nodes = new HashSet<>();
         int[] visite = new int[graph.getNbNodes()];
         int[] debut = new int[graph.getNbNodes()];
@@ -284,8 +281,12 @@ public class GraphTools {
         compt = 0;
         for (DirectedNode directedNode : nodeList) {
             if (!nodes.contains(directedNode)) {
-                System.out.println(explorerSommet(directedNode, nodes, visite, debut, fin));
-
+                if (displayCFC) {
+                    System.out.println("CFC:");
+                    System.out.println(explorerSommet(directedNode, nodes, visite, debut, fin));
+                } else {
+                    explorerSommet(directedNode, nodes, visite, debut, fin);
+                }
             }
         }
         return new int[][]{debut, fin, visite};
@@ -375,23 +376,22 @@ public class GraphTools {
 
 
     public static void CFC(DirectedGraph g) {
-        int[] fin = explorerGraphe(g, g.getNodes())[1];
+        int[] fin = explorerGraphe(g, g.getNodes(), false)[1];
         DirectedGraph inverse = g.computeInverse();
-        TreeMap<Integer,Integer> map = new TreeMap();
-        for( int i = 0; i < fin.length; ++i ) {
-            map.put( fin[i], i );
+        TreeMap<Integer, Integer> map = new TreeMap();
+        for (int i = 0; i < fin.length; ++i) {
+            map.put(fin[i], i);
         }
         List<Integer> finDécroissant = map.values().stream().collect(Collectors.toList());
         Collections.reverse(finDécroissant);
         List<DirectedNode> nodesInverse = finDécroissant.stream().map(i -> inverse.getNodeOfList(inverse.makeNode(i))).collect(Collectors.toList());
-        System.out.println("CFC");
-        explorerGraphe(inverse, nodesInverse);
+        explorerGraphe(inverse, nodesInverse, true);
     }
 
     public static void main(String[] args) {
-        int[][] mat = generateGraphData(7, 10, false, false, false, 13);
+        int[][] mat = generateGraphData(8, 14, false, false, false, 13);
 		afficherMatrix(mat);
-		DirectedGraph g = new DirectedGraph(mat);;
+		DirectedGraph g = new DirectedGraph(mat);
 		CFC(g);
 
 	}
