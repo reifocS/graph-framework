@@ -382,9 +382,9 @@ public class GraphTools {
         for (int i = 0; i < fin.length; ++i) {
             map.put(fin[i], i);
         }
-        List<Integer> finDécroissant = map.values().stream().collect(Collectors.toList());
-        Collections.reverse(finDécroissant);
-        List<DirectedNode> nodesInverse = finDécroissant.stream().map(i -> inverse.getNodeOfList(inverse.makeNode(i))).collect(Collectors.toList());
+        List<Integer> finDecroissant = map.values().stream().collect(Collectors.toList());
+        Collections.reverse(finDecroissant);
+        List<DirectedNode> nodesInverse = finDecroissant.stream().map(i -> inverse.getNodeOfList(inverse.makeNode(i))).collect(Collectors.toList());
         explorerGraphe(inverse, nodesInverse, true);
     }
 
