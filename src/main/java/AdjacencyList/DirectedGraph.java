@@ -145,7 +145,7 @@ public class DirectedGraph extends AbstractListGraph<DirectedNode> implements ID
 	 *         => edge
 	 */
 	@Override
-	public IDirectedGraph computeInverse() {
+	public DirectedGraph computeInverse() {
 		DirectedGraph g = new DirectedGraph(this);
 		List<DirectedNode> nodes = g.getNodes();
 		for (DirectedNode n : nodes) {

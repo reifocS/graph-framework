@@ -3,9 +3,12 @@ package AdjacencyList;
 import static GraphAlgorithms.GraphTools.bellman;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import GraphAlgorithms.GraphTools;
 import Nodes.DirectedNode;
+import static GraphAlgorithms.GraphTools.bellman;
+import static GraphAlgorithms.GraphTools.dijkstra;
 
 public class DirectedValuedGraph extends DirectedGraph {
 
@@ -65,7 +68,7 @@ public class DirectedValuedGraph extends DirectedGraph {
 
 	public static void main(String[] args) {
 		int[][] matrix = GraphTools.generateGraphData(10, 20, false, false, false, 100001);
-		int[][] matrixValued = GraphTools.generateValuedGraphData(10, false, false, true, false, 100001);
+		int[][] matrixValued = GraphTools.generateValuedGraphData(10, false, false, true, false, 5);
 		GraphTools.afficherMatrix(matrix);
 		GraphTools.afficherMatrix(matrixValued);
 		DirectedValuedGraph al = new DirectedValuedGraph(matrixValued);
@@ -87,16 +90,13 @@ public class DirectedValuedGraph extends DirectedGraph {
 
 				{ 0, 0, 0, -2, -2, 0, 0 }, { 0, 0, 0, 0, 0, 2, 0 }, { 0, 0, 0, 0, 0, 6, 4 }, { 0, 0, 0, 0, -2, 0, -3 },
 				{ 4, 2, 0, 0, 0, 0, 0 } };
-
-		DirectedValuedGraph al2 = new DirectedValuedGraph(testBellman);
-		System.out.println(al2);
-		int[][] dist = bellman(al2, al2.getNodeOfList(al2.makeNode(0)));
-		for (int i = 0; i < dist.length; ++i) {
-			String s = "";
-			for (int j = 0; j < dist[i].length; ++j) {
-				s += dist[i][j] + ",";
-			}
-			System.out.println(s);
+		DirectedValuedGraph al2= new DirectedValuedGraph(testBellman);
+		DirectedValuedGraph bel = new DirectedValuedGraph(matrixValued);
+        // System.out.println(al2);
+        // int[][] dist = bellman(al2, al2.getNodeOfList(al2.makeNode(0)));
+        int[] d2 = dijkstra(bel, bel.getNodeOfList(bel.makeNode(0)));
+        for(int i : d2) {
+			System.out.println(i);
 		}
 	}
 
