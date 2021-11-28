@@ -79,9 +79,13 @@ public class UndirectedGraph extends AbstractListGraph<UndirectedNode> implement
 
 	@Override
 	public boolean isEdge(UndirectedNode x, UndirectedNode y) {
-		UndirectedNode xElement = this.getNodeOfList(x);
-		UndirectedNode yElement = this.getNodeOfList(y);
-		return xElement.getNeighbours().containsKey(yElement) && yElement.getNeighbours().containsKey(xElement);
+		if (this.isIncluded(x) && this.isIncluded(y)) {
+
+			UndirectedNode xElement = this.getNodeOfList(x);
+			UndirectedNode yElement = this.getNodeOfList(y);
+			return xElement.getNeighbours().containsKey(yElement) && yElement.getNeighbours().containsKey(xElement);
+		}
+		return false;
 	}
 
 	@Override
@@ -97,7 +101,7 @@ public class UndirectedGraph extends AbstractListGraph<UndirectedNode> implement
 
 	@Override
 	public void addEdge(UndirectedNode x, UndirectedNode y) {
-		if (!isEdge(x, y)) {
+		if (this.isIncluded(x) && this.isIncluded(y)) {
 			UndirectedNode xElement = this.getNodeOfList(x);
 			UndirectedNode yElement = this.getNodeOfList(y);
 			xElement.getNeighbours().put(yElement, 0);
@@ -125,7 +129,10 @@ public class UndirectedGraph extends AbstractListGraph<UndirectedNode> implement
 	 * @return the corresponding nodes in the list this.nodes
 	 */
 	public UndirectedNode getNodeOfList(UndirectedNode src) {
-		return this.getNodes().get(src.getLabel());
+		if (this.isIncluded(src)) {
+			return this.getNodes().get(src.getLabel());
+		}
+		return null;
 	}
 
 	/**

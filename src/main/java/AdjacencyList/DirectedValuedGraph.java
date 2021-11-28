@@ -1,14 +1,12 @@
 package AdjacencyList;
 
 import static GraphAlgorithms.GraphTools.bellman;
+import static GraphAlgorithms.GraphTools.dijkstra;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import GraphAlgorithms.GraphTools;
 import Nodes.DirectedNode;
-import static GraphAlgorithms.GraphTools.bellman;
-import static GraphAlgorithms.GraphTools.dijkstra;
 
 public class DirectedValuedGraph extends DirectedGraph {
 
@@ -43,7 +41,7 @@ public class DirectedValuedGraph extends DirectedGraph {
 	 * Adds the arc (from,to) with cost if it is not already present in the graph
 	 */
 	public void addArc(DirectedNode from, DirectedNode to, int cost) {
-		if (!isArc(from, to)) {
+		if (!isArc(from, to) && this.isIncluded(from) && this.isIncluded(to)) {
 			DirectedNode xElement = this.getNodeOfList(from);
 			DirectedNode yElement = this.getNodeOfList(to);
 			xElement.getSuccs().put(yElement, cost);
@@ -85,18 +83,23 @@ public class DirectedValuedGraph extends DirectedGraph {
 		GraphTools.afficherMatrix(al.toAdjacencyMatrix());
 		System.out.println(al.toString());
 		System.out.println(al.getNbArcs());
-		// Test Bellman
-		int[][] testBellman = new int[][] { { 0, 3, 1, 0, 0, 0, 0 }, { 0, 0, 0, 0, -2, 1, 0 },
-
-				{ 0, 0, 0, -2, -2, 0, 0 }, { 0, 0, 0, 0, 0, 2, 0 }, { 0, 0, 0, 0, 0, 6, 4 }, { 0, 0, 0, 0, -2, 0, -3 },
-				{ 4, 2, 0, 0, 0, 0, 0 } };
-		DirectedValuedGraph al2= new DirectedValuedGraph(testBellman);
-		DirectedValuedGraph bel = new DirectedValuedGraph(matrixValued);
-        // System.out.println(al2);
-        // int[][] dist = bellman(al2, al2.getNodeOfList(al2.makeNode(0)));
-        int[] d2 = dijkstra(bel, bel.getNodeOfList(bel.makeNode(0)));
-        for(int i : d2) {
-			System.out.println(i);
+		// Bellman
+		int[][] test = new int[][] { { 0, 3, 1, 0, 0, 0, 0 }, { 0, 0, 0, 0, -2, 1, 0 }, { 0, 0, 0, -2, -2, 0, 0 },
+				{ 0, 0, 0, 0, 0, 2, 0 }, { 0, 0, 0, 0, 0, 6, 4 }, { 0, 0, 0, 0, -2, 0, -3 }, { 4, 2, 0, 0, 0, 0, 0 } };
+		DirectedValuedGraph gVal = new DirectedValuedGraph(test);
+		System.out.println(gVal);
+		int[][] bell = bellman(gVal, gVal.getNodeOfList(gVal.makeNode(0)));
+		for (int i = 0; i < bell.length; i++) {
+			for (int j = 0; j < bell[i].length; j++) {
+				System.out.print(bell[i][j] + ' ');
+			}
+			System.out.println();
+		}
+		// dijkstra
+		DirectedValuedGraph gVal2 = new DirectedValuedGraph(matrixValued);
+		int[] dij = dijkstra(gVal2, gVal2.getNodeOfList(gVal2.makeNode(0)));
+		for (int i : dij) {
+			System.out.print(i + " ");
 		}
 	}
 

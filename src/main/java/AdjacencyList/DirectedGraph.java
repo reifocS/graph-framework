@@ -1,6 +1,7 @@
 package AdjacencyList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +11,7 @@ import GraphAlgorithms.GraphTools;
 import Nodes.DirectedNode;
 
 //TODO
-//1) compléter ces méthodes et celles de directedValuedGraph
+//1) completer ces methodes et celles de directedValuedGraph
 //2) directedNode
 //3) Bellman dans Tools/
 public class DirectedGraph extends AbstractListGraph<DirectedNode> implements IDirectedGraph {
@@ -74,10 +75,14 @@ public class DirectedGraph extends AbstractListGraph<DirectedNode> implements ID
 
 	@Override
 	public boolean isArc(DirectedNode from, DirectedNode to) {
-		DirectedNode xElement = this.getNodeOfList(from);
-		DirectedNode yElement = this.getNodeOfList(to);
-		return xElement.getNbSuccs() > 0 && yElement.getNbPreds() > 0 && xElement.getSuccs().containsKey(yElement)
-				&& yElement.getPreds().containsKey(xElement);
+		if (this.isIncluded(from) && this.isIncluded(to)) {
+
+			DirectedNode xElement = this.getNodeOfList(from);
+			DirectedNode yElement = this.getNodeOfList(to);
+			return xElement.getNbSuccs() > 0 && yElement.getNbPreds() > 0 && xElement.getSuccs().containsKey(yElement)
+					&& yElement.getPreds().containsKey(xElement);
+		}
+		return false;
 
 	}
 
@@ -94,7 +99,7 @@ public class DirectedGraph extends AbstractListGraph<DirectedNode> implements ID
 
 	@Override
 	public void addArc(DirectedNode from, DirectedNode to) {
-		if (!isArc(from, to)) {
+		if (!isArc(from, to) && this.isIncluded(from) && this.isIncluded(to)) {
 			DirectedNode xElement = this.getNodeOfList(from);
 			DirectedNode yElement = this.getNodeOfList(to);
 			xElement.getSuccs().put(yElement, 0);
@@ -122,7 +127,11 @@ public class DirectedGraph extends AbstractListGraph<DirectedNode> implements ID
 	 * @return the corresponding nodes in the list this.nodes
 	 */
 	public DirectedNode getNodeOfList(DirectedNode src) {
-		return this.getNodes().get(src.getLabel());
+		if (this.isIncluded(src)) {
+			return this.getNodes().get(src.getLabel());
+		}
+		return null;
+
 	}
 
 	/**
@@ -134,7 +143,8 @@ public class DirectedGraph extends AbstractListGraph<DirectedNode> implements ID
 		for (int i = 0; i < order; i++) {
 			for (DirectedNode j : nodes.get(i).getSuccs().keySet()) {
 				int IndSucc = j.getLabel();
-				matrix[i][IndSucc] = 1;
+				// incrementation, even if we do not have a multigraph
+				matrix[i][IndSucc]++;
 			}
 		}
 		return matrix;
