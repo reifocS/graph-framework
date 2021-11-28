@@ -53,9 +53,12 @@ public class AdjacencyMatrixUndirectedGraph extends AbstractMatrixGraph<Undirect
 
 	public List<Integer> getNeighbours(AbstractNode x) {
 		List<Integer> l = new ArrayList<>();
-		for (int i = 0; i < matrix[x.getLabel()].length; i++) {
-			if (matrix[x.getLabel()][i] > 0) {
-				l.add(i);
+		if (this.isIncluded(x)) {
+
+			for (int i = 0; i < matrix[x.getLabel()].length; i++) {
+				if (matrix[x.getLabel()][i] > 0) {
+					l.add(i);
+				}
 			}
 		}
 		return l;
@@ -67,8 +70,7 @@ public class AdjacencyMatrixUndirectedGraph extends AbstractMatrixGraph<Undirect
 
 	@Override
 	public boolean isEdge(UndirectedNode x, UndirectedNode y) {
-		// A completer
-		return matrix[x.getLabel()][y.getLabel()] > 0;
+		return this.isIncluded(x) && this.isIncluded(y) && matrix[x.getLabel()][y.getLabel()] > 0;
 	}
 
 	/**
@@ -77,10 +79,10 @@ public class AdjacencyMatrixUndirectedGraph extends AbstractMatrixGraph<Undirect
 	 */
 	@Override
 	public void removeEdge(UndirectedNode x, UndirectedNode y) {
-		// A completer
-		if (isEdge(x, y)) {
+		if (this.isIncluded(x) && this.isIncluded(y) && isEdge(x, y)) {
 			matrix[x.getLabel()][y.getLabel()]--;
 			matrix[y.getLabel()][x.getLabel()]--;
+			this.m--;
 		}
 	}
 
@@ -89,8 +91,11 @@ public class AdjacencyMatrixUndirectedGraph extends AbstractMatrixGraph<Undirect
 	 */
 	@Override
 	public void addEdge(UndirectedNode x, UndirectedNode y) {
-		matrix[x.getLabel()][y.getLabel()]++;
-		matrix[y.getLabel()][x.getLabel()]++;
+		if (this.isIncluded(x) && this.isIncluded(y)) {
+			matrix[x.getLabel()][y.getLabel()]++;
+			matrix[y.getLabel()][x.getLabel()]++;
+			this.m++;
+		}
 	}
 
 	/**
@@ -130,5 +135,14 @@ public class AdjacencyMatrixUndirectedGraph extends AbstractMatrixGraph<Undirect
 		am.removeEdge(new UndirectedNode(2), new UndirectedNode(5));
 		System.out.println(am);
 		// A completer
+		System.out.println(am);
+		System.out.println(am.getNbEdges());
+		UndirectedNode xElement = new UndirectedNode(5);
+		UndirectedNode yElement = new UndirectedNode(9);
+		am.addEdge(xElement, yElement);
+		GraphTools.afficherMatrix(am.toAdjacencyMatrix());
+		System.out.println(am);
+		System.out.println(am.getNbEdges());
+
 	}
 }
