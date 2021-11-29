@@ -151,12 +151,12 @@ public class AdjacencyMatrixDirectedGraph extends AbstractMatrixGraph<DirectedNo
 			System.out.print(integer + ", ");
 		}
 		System.out.println();
-
 		// A completer
 		System.out.println(am);
 		System.out.println(am.getNbArcs());
 		DirectedNode xElement = new DirectedNode(5);
 		DirectedNode yElement = new DirectedNode(9);
+		am.addArc(xElement, yElement);
 		am.addArc(xElement, yElement);
 		GraphTools.afficherMatrix(am.toAdjacencyMatrix());
 		System.out.println(am);

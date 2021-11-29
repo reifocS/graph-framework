@@ -2,6 +2,7 @@ package AdjacencyMatrix;
 
 import GraphAlgorithms.GraphTools;
 import Nodes.AbstractNode;
+import Nodes.DirectedNode;
 import Nodes.UndirectedNode;
 
 public class AdjacencyMatrixUndirectedValuedGraph extends AdjacencyMatrixUndirectedGraph {
@@ -76,8 +77,7 @@ public class AdjacencyMatrixUndirectedValuedGraph extends AdjacencyMatrixUndirec
 		if (this.isIncluded(x) && this.isIncluded(y)) {
 			int xL = x.getLabel();
 			int yL = y.getLabel();
-			this.matrixCosts[xL][yL] = this.matrixCosts[xL][yL] > 0 ? this.matrixCosts[xL][yL]
-					: cost;
+			this.matrixCosts[xL][yL] = this.matrixCosts[xL][yL] > 0 ? this.matrixCosts[xL][yL] : cost;
 			this.matrixCosts[yL][xL] = this.matrixCosts[xL][yL];
 		}
 	}
@@ -101,6 +101,18 @@ public class AdjacencyMatrixUndirectedValuedGraph extends AdjacencyMatrixUndirec
 		AdjacencyMatrixUndirectedValuedGraph am = new AdjacencyMatrixUndirectedValuedGraph(matrix, matrixValued);
 		System.out.println(am);
 		// A completer
+		System.out.println(am.getNbEdges());
+		UndirectedNode xElement = new UndirectedNode(5);
+		UndirectedNode yElement = new UndirectedNode(15);
+		am.addEdge(xElement, yElement, 8);
+		am.addEdge(xElement, yElement, 8);
+		System.out.println(am);
+		System.out.println(am.getNbEdges());
+		while (am.isEdge(xElement, yElement)) {
+			am.removeEdge(xElement, yElement);
+		}
+		System.out.println(am);
+		System.out.println(am.getNbEdges());
 	}
 
 }

@@ -140,6 +140,7 @@ public class AdjacencyMatrixUndirectedGraph extends AbstractMatrixGraph<Undirect
 		UndirectedNode xElement = new UndirectedNode(5);
 		UndirectedNode yElement = new UndirectedNode(9);
 		am.addEdge(xElement, yElement);
+		am.addEdge(xElement, yElement);
 		GraphTools.afficherMatrix(am.toAdjacencyMatrix());
 		System.out.println(am);
 		System.out.println(am.getNbEdges());
