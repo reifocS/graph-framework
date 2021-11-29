@@ -43,6 +43,6 @@ public abstract class AbstractMatrixGraph<A extends AbstractNode> implements IGr
 
 	@Override
 	public boolean isIncluded(AbstractNode node) {
-		return node.getLabel() < matrix.length;
+		return node.getLabel() < this.matrix.length;
 	}
 }

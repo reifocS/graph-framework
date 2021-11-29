@@ -37,6 +37,9 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 	// --------------------------------------------------
 
 	/**
+	 * All edges which have the same vertex origin and destination are of the same
+	 * cost
+	 * 
 	 * @return the matrix with costs of the graph
 	 */
 	public int[][] getMatrixCosts() {
@@ -54,7 +57,12 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 	@Override
 	public void removeArc(DirectedNode from, DirectedNode to) {
 		super.removeArc(from, to);
-		// A completer
+		if (this.isIncluded(from) && this.isIncluded(to) && !isArc(from, to)) {
+			int fL = from.getLabel();
+			int tL = to.getLabel();
+			this.matrixCosts[fL][tL] = 0;
+			this.matrixCosts[tL][fL] = this.matrixCosts[fL][tL];
+		}
 	}
 
 	/**
@@ -63,7 +71,11 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 	 */
 	public void addArc(DirectedNode from, DirectedNode to, int cost) {
 		super.addArc(from, to);
-		// A completer
+		if (this.isIncluded(from) && this.isIncluded(to)) {
+			int fL = from.getLabel();
+			int tL = to.getLabel();
+			this.matrixCosts[fL][tL] = this.matrixCosts[fL][tL] > 0 ? this.matrixCosts[fL][tL] : cost;
+		}
 	}
 
 	public String toString() {
@@ -84,5 +96,17 @@ public class AdjacencyMatrixDirectedValuedGraph extends AdjacencyMatrixDirectedG
 		AdjacencyMatrixDirectedValuedGraph am = new AdjacencyMatrixDirectedValuedGraph(matrix, matrixValued);
 		System.out.println(am);
 		// A completer
+		System.out.println(am.getNbArcs());
+		DirectedNode xElement = new DirectedNode(5);
+		DirectedNode yElement = new DirectedNode(15);
+		am.addArc(xElement, yElement, 8);
+		am.addArc(xElement, yElement, 8);
+		System.out.println(am);
+		System.out.println(am.getNbArcs());
+		while (am.isArc(xElement, yElement)) {
+			am.removeArc(xElement, yElement);
+		}
+		System.out.println(am);
+		System.out.println(am.getNbArcs());
 	}
 }

@@ -76,7 +76,6 @@ public class DirectedGraph extends AbstractListGraph<DirectedNode> implements ID
 	@Override
 	public boolean isArc(DirectedNode from, DirectedNode to) {
 		if (this.isIncluded(from) && this.isIncluded(to)) {
-
 			DirectedNode xElement = this.getNodeOfList(from);
 			DirectedNode yElement = this.getNodeOfList(to);
 			return xElement.getNbSuccs() > 0 && yElement.getNbPreds() > 0 && xElement.getSuccs().containsKey(yElement)

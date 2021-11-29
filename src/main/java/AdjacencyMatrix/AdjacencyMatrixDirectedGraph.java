@@ -3,6 +3,7 @@ package AdjacencyMatrix;
 import Abstraction.AbstractMatrixGraph;
 import Abstraction.IDirectedGraph;
 import GraphAlgorithms.GraphTools;
+import Nodes.AbstractNode;
 import Nodes.DirectedNode;
 
 import java.util.ArrayList;
@@ -50,9 +51,11 @@ public class AdjacencyMatrixDirectedGraph extends AbstractMatrixGraph<DirectedNo
 
 	public List<Integer> getSuccessors(DirectedNode x) {
 		List<Integer> v = new ArrayList<Integer>();
-		for (int i = 0; i < this.matrix[x.getLabel()].length; i++) {
-			if (this.matrix[x.getLabel()][i] > 0) {
-				v.add(i);
+		if (this.isIncluded(x)) {
+			for (int i = 0; i < this.matrix[x.getLabel()].length; i++) {
+				if (this.matrix[x.getLabel()][i] > 0) {
+					v.add(i);
+				}
 			}
 		}
 		return v;
@@ -60,9 +63,11 @@ public class AdjacencyMatrixDirectedGraph extends AbstractMatrixGraph<DirectedNo
 
 	public List<Integer> getPredecessors(DirectedNode x) {
 		List<Integer> v = new ArrayList<Integer>();
-		for (int i = 0; i < this.matrix.length; i++) {
-			if (this.matrix[i][x.getLabel()] > 0) {
-				v.add(i);
+		if (this.isIncluded(x)) {
+			for (int i = 0; i < this.matrix.length; i++) {
+				if (this.matrix[i][x.getLabel()] > 0) {
+					v.add(i);
+				}
 			}
 		}
 		return v;
@@ -74,8 +79,7 @@ public class AdjacencyMatrixDirectedGraph extends AbstractMatrixGraph<DirectedNo
 
 	@Override
 	public boolean isArc(DirectedNode from, DirectedNode to) {
-		// A completer
-		return matrix[from.getLabel()][to.getLabel()] > 0;
+		return this.isIncluded(from) && this.isIncluded(to) && this.matrix[from.getLabel()][to.getLabel()] > 0;
 	}
 
 	/**
@@ -84,11 +88,10 @@ public class AdjacencyMatrixDirectedGraph extends AbstractMatrixGraph<DirectedNo
 	 */
 	@Override
 	public void removeArc(DirectedNode from, DirectedNode to) {
-		// A completer
-		if (isArc(from, to)) {
-			return;
+		if (this.isIncluded(from) && this.isIncluded(to) && this.isArc(from, to)) {
+			this.matrix[from.getLabel()][to.getLabel()]--;
+			this.m--;
 		}
-		matrix[from.getLabel()][to.getLabel()]--;
 	}
 
 	/**
@@ -96,7 +99,10 @@ public class AdjacencyMatrixDirectedGraph extends AbstractMatrixGraph<DirectedNo
 	 */
 	@Override
 	public void addArc(DirectedNode from, DirectedNode to) {
-		matrix[from.getLabel()][to.getLabel()]++;
+		if (this.isIncluded(from) && this.isIncluded(to)) {
+			this.matrix[from.getLabel()][to.getLabel()]++;
+			this.m++;
+		}
 	}
 
 	/**
@@ -135,15 +141,26 @@ public class AdjacencyMatrixDirectedGraph extends AbstractMatrixGraph<DirectedNo
 	public static void main(String[] args) {
 		int[][] matrix2 = GraphTools.generateGraphData(10, 20, false, false, false, 100001);
 		AdjacencyMatrixDirectedGraph am = new AdjacencyMatrixDirectedGraph(matrix2);
-		System.out.println(am);
-		/*
-		 * List<Integer> t = am.getSuccessors(new DirectedNode(1)); for (Integer integer
-		 * : t) { System.out.print(integer + ", "); } System.out.println();
-		 * List<Integer> t2 = am.getPredecessors(new DirectedNode(2)); for (Integer
-		 * integer : t2) { System.out.print(integer + ", "); }
-		 */
+		List<Integer> t = am.getSuccessors(new DirectedNode(1));
+		for (Integer integer : t) {
+			System.out.print(integer + ", ");
+		}
+		System.out.println();
+		List<Integer> t2 = am.getPredecessors(new DirectedNode(2));
+		for (Integer integer : t2) {
+			System.out.print(integer + ", ");
+		}
+		System.out.println();
 		// A completer
-		am.addArc(new DirectedNode(0), new DirectedNode(5));
 		System.out.println(am);
+		System.out.println(am.getNbArcs());
+		DirectedNode xElement = new DirectedNode(5);
+		DirectedNode yElement = new DirectedNode(9);
+		am.addArc(xElement, yElement);
+		am.addArc(xElement, yElement);
+		GraphTools.afficherMatrix(am.toAdjacencyMatrix());
+		System.out.println(am);
+		System.out.println(am.getNbArcs());
 	}
+
 }

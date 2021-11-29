@@ -2,6 +2,7 @@ package AdjacencyMatrix;
 
 import GraphAlgorithms.GraphTools;
 import Nodes.AbstractNode;
+import Nodes.DirectedNode;
 import Nodes.UndirectedNode;
 
 public class AdjacencyMatrixUndirectedValuedGraph extends AdjacencyMatrixUndirectedGraph {
@@ -39,6 +40,9 @@ public class AdjacencyMatrixUndirectedValuedGraph extends AdjacencyMatrixUndirec
 	// --------------------------------------------------
 
 	/**
+	 * All edges which have the same vertex origin and destination are of the same
+	 * cost
+	 * 
 	 * @return the matrix with costs of the graph
 	 */
 	public int[][] getMatrixCosts() {
@@ -51,12 +55,17 @@ public class AdjacencyMatrixUndirectedValuedGraph extends AdjacencyMatrixUndirec
 
 	/**
 	 * removes the edge (x,y) if there exists at least one between these nodes in
-	 * the graph. And if there remains no arc, removes the cost.
+	 * the graph. And if there remains no edge, removes the cost.
 	 */
 	@Override
 	public void removeEdge(UndirectedNode x, UndirectedNode y) {
 		super.removeEdge(x, y);
-		// A completer
+		if (this.isIncluded(x) && this.isIncluded(y) && !isEdge(x, y)) {
+			int xL = x.getLabel();
+			int yL = y.getLabel();
+			this.matrixCosts[xL][yL] = 0;
+			this.matrixCosts[yL][xL] = this.matrixCosts[xL][yL];
+		}
 	}
 
 	/**
@@ -65,7 +74,12 @@ public class AdjacencyMatrixUndirectedValuedGraph extends AdjacencyMatrixUndirec
 	 */
 	public void addEdge(UndirectedNode x, UndirectedNode y, int cost) {
 		super.addEdge(x, y);
-		// A completer
+		if (this.isIncluded(x) && this.isIncluded(y)) {
+			int xL = x.getLabel();
+			int yL = y.getLabel();
+			this.matrixCosts[xL][yL] = this.matrixCosts[xL][yL] > 0 ? this.matrixCosts[xL][yL] : cost;
+			this.matrixCosts[yL][xL] = this.matrixCosts[xL][yL];
+		}
 	}
 
 	public String toString() {
@@ -87,6 +101,18 @@ public class AdjacencyMatrixUndirectedValuedGraph extends AdjacencyMatrixUndirec
 		AdjacencyMatrixUndirectedValuedGraph am = new AdjacencyMatrixUndirectedValuedGraph(matrix, matrixValued);
 		System.out.println(am);
 		// A completer
+		System.out.println(am.getNbEdges());
+		UndirectedNode xElement = new UndirectedNode(5);
+		UndirectedNode yElement = new UndirectedNode(15);
+		am.addEdge(xElement, yElement, 8);
+		am.addEdge(xElement, yElement, 8);
+		System.out.println(am);
+		System.out.println(am.getNbEdges());
+		while (am.isEdge(xElement, yElement)) {
+			am.removeEdge(xElement, yElement);
+		}
+		System.out.println(am);
+		System.out.println(am.getNbEdges());
 	}
 
 }
