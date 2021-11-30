@@ -1,10 +1,10 @@
 package GraphAlgorithms;
 
-import Collection.Triple;
-import Nodes.UndirectedNode;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import Collection.Triple;
+import Nodes.UndirectedNode;
 
 public class BinaryHeapEdge {
 
