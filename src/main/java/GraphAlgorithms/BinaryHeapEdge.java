@@ -1,10 +1,10 @@
 package GraphAlgorithms;
 
-import Collection.Triple;
-import Nodes.UndirectedNode;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import Collection.Triple;
+import Nodes.UndirectedNode;
 
 public class BinaryHeapEdge {
 
@@ -17,6 +17,15 @@ public class BinaryHeapEdge {
 		this.binh = new ArrayList<>();
 	}
 
+	/**
+	 * To allow test comparison of Prim's algorithm
+	 * @return
+	 */
+	public List<Triple<UndirectedNode, UndirectedNode, Integer>> getBinh() {
+		System.out.println("getBinh - For test purpose only");
+		return binh;
+	}
+	
 	public boolean isEmpty() {
 		return binh.isEmpty();
 	}
@@ -55,6 +64,11 @@ public class BinaryHeapEdge {
 		return racine;
 	}
 
+	/**
+	 * as long as x is not the root of the tree and x is strictly superior to its father, 
+	 * we exchange the positions of x and its father. 
+	 * @param index
+	 */
 	private void percolateDown(int elemIndex) {
 
 		int x = getBestChildPos(elemIndex);

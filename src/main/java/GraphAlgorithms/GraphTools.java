@@ -1,5 +1,16 @@
 package GraphAlgorithms;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+
 import AdjacencyList.DirectedGraph;
 import AdjacencyList.DirectedValuedGraph;
 import AdjacencyList.UndirectedValuedGraph;
@@ -7,48 +18,111 @@ import Collection.Triple;
 import Nodes.DirectedNode;
 import Nodes.UndirectedNode;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 public class GraphTools {
 
 	private static int _DEBBUG = 0;
 	private static int INF = Integer.MAX_VALUE;
-    private static int compt = 0;
+	private static int compt = 0;
 
 	public GraphTools() {
 
 	}
 
-
-    // TODO
-    public List<Triple<UndirectedNode, UndirectedNode, Integer>> prim(UndirectedValuedGraph undirectedGraph) {
-        List edges = new ArrayList();
-        List visitedNodes = new ArrayList();
-        BinaryHeapEdge binaryHeapEdge = new BinaryHeapEdge();
-        List<UndirectedNode> nodes = undirectedGraph.getNodes();
-        primIteration(nodes.get(0), edges, binaryHeapEdge);
-        visitedNodes.add(nodes.get(0));
-        return edges;
-	}
-
-	private void primIteration(UndirectedNode undirectedNode,
-			List<Triple<UndirectedNode, UndirectedNode, Integer>> edges, BinaryHeapEdge binaryHeapEdge) {
-		List<Triple<UndirectedNode, UndirectedNode, Integer>> adj = getAllAdjacent(undirectedNode);
-		for (Triple<UndirectedNode, UndirectedNode, Integer> triple : adj) {
-			binaryHeapEdge.insert(triple.getFirst(), triple.getSecond(), triple.getThird());
+	// TODO - minimumWeightSpanningTree
+	public static List<Triple<UndirectedNode, UndirectedNode, Integer>> prim(UndirectedValuedGraph graph) {
+		int startEdgePosition = 0; // to parameters if need
+		// Initialization
+		List<Triple<UndirectedNode, UndirectedNode, Integer>> edges = new ArrayList<Triple<UndirectedNode, UndirectedNode, Integer>>();
+		List<UndirectedNode> visitedNodes = new ArrayList<UndirectedNode>();
+		BinaryHeapEdge binaryHeapEdge = new BinaryHeapEdge();
+		List<UndirectedNode> nodes = graph.getNodes();
+		// n=1
+		UndirectedNode startNode = nodes.get(startEdgePosition);
+		Triple<UndirectedNode, UndirectedNode, Integer> startEdge = getBestEdge(startNode,
+				new ArrayList<UndirectedNode>());
+		binaryHeapEdge.insert(startEdge.getFirst(), startEdge.getSecond(), startEdge.getThird());
+		// n+1
+		try {
+			for (UndirectedNode undirectedNode : nodes) {
+				Triple<UndirectedNode, UndirectedNode, Integer> edge = getBestEdge(binaryHeapEdge);
+				binaryHeapEdge.insert(edge.getFirst(), edge.getSecond(), edge.getThird());
+				visitedNodes.add(nodes.get(0));
+			}
+		} catch (Exception e) {
+			if (e.getMessage() == "No adjancent nodes available" && visitedNodes.size() < graph.getNbNodes()) {
+				System.out.println("Not a connex graph");
+			}
 		}
+		// result
+		return edges;
 	}
 
+	/**
+	 * TODO To get the best available edge for ALL visited node
+	 * 
+	 * @param bhe
+	 * @return
+	 */
+	private static Triple<UndirectedNode, UndirectedNode, Integer> getBestEdge(BinaryHeapEdge bhe) {
+		// here I use getBinh but I think it should not be the case as I was not
+		// implemented and as I do not take profit of the bhe structure
+		// TODO Erase
+//    	Triple<UndirectedNode, UndirectedNode, Integer> edgeChosen = bhe.getBinh().get(0);
+//    	for (Triple<UndirectedNode, UndirectedNode, Integer> iterable_element : bhe.getBinh()) {
+//    		Triple<UndirectedNode, UndirectedNode, Integer> edgeCandidate = getBestEdge(iterable_element.getFirst(), bhe.getBinh()); // not bhe.getBinh()
+//    		if(edgeCandidate.getThird() < edgeChosen.getThird()) {
+//    			edgeChosen = iterable_element;
+//    		}
+//		}
+//    	return edgeChosen;
+		return null;
+	}
 
-    private List<Triple<UndirectedNode, UndirectedNode, Integer>> getAllAdjacent(UndirectedNode undirectedNode) {
-        ArrayList<Triple<UndirectedNode, UndirectedNode, Integer>> adj = new ArrayList<>();
-        Map<UndirectedNode, Integer> ng = undirectedNode.getNeighbours();
-        for (Map.Entry<UndirectedNode, Integer> entry : ng.entrySet()) {
-            adj.add(new Triple<>(undirectedNode, entry.getKey(), entry.getValue()));
-        }
-        return adj;
-    }
+	/**
+	 * To get the best available edge from ONE node
+	 * 
+	 * @param evaluatedNode
+	 * @param visitedNodes
+	 * @return
+	 */
+	private static Triple<UndirectedNode, UndirectedNode, Integer> getBestEdge(UndirectedNode evaluatedNode,
+			List<UndirectedNode> visitedNodes) {
+		List<Triple<UndirectedNode, UndirectedNode, Integer>> adj = getAllAdjacent(evaluatedNode);
+		// select all adjacent nodes which will not produce a cycle
+		List<Triple<UndirectedNode, UndirectedNode, Integer>> adjSelect = null;
+		for (Triple<UndirectedNode, UndirectedNode, Integer> triple : adj) {
+			if (!(visitedNodes.contains(triple.getFirst()) || visitedNodes.contains(triple.getSecond()))) {
+				adjSelect.add(new Triple<UndirectedNode, UndirectedNode, Integer>(triple.getFirst(), triple.getSecond(),
+						triple.getThird()));
+			}
+		}
+		if (adjSelect.size() <= 0) {
+			throw new Error("No adjancent nodes available");
+		}
+		// select the nearest adjacent node
+		Triple<UndirectedNode, UndirectedNode, Integer> edgeChosen = adjSelect.get(0);
+		for (Triple<UndirectedNode, UndirectedNode, Integer> triple : adjSelect) {
+			if (triple.getThird() < edgeChosen.getThird()) {
+				edgeChosen = triple;
+			}
+		}
+		// return the nearest adjacent node which does not produce any cycle
+		return edgeChosen;
+	}
+
+	/**
+	 * 
+	 * @param evaluatedNode
+	 * @return
+	 */
+	private static List<Triple<UndirectedNode, UndirectedNode, Integer>> getAllAdjacent(UndirectedNode evaluatedNode) {
+		ArrayList<Triple<UndirectedNode, UndirectedNode, Integer>> adj = new ArrayList<>();
+		Map<UndirectedNode, Integer> ng = evaluatedNode.getNeighbours();
+		for (Map.Entry<UndirectedNode, Integer> entry : ng.entrySet()) {
+			adj.add(new Triple<>(evaluatedNode, entry.getKey(), entry.getValue()));
+		}
+		return adj;
+	}
 
 	/**
 	 * @param n,     the number of vertices
@@ -256,144 +330,195 @@ public class GraphTools {
 		return mat;
 	}
 
-	public static List<DirectedNode> explorerSommet(DirectedNode sommet, Set<DirectedNode> nodeSet, int[] visite, int[] debut, int[] fin) {
-        nodeSet.add(sommet);
-        visite[sommet.getLabel()] = 1;
-        debut[sommet.getLabel()] = compt++;
-        List<DirectedNode> directedNodes = new ArrayList<>();
-        directedNodes.add(sommet);
-        for (DirectedNode voisin : sommet.getSuccs().keySet()) {
-            if (!nodeSet.contains(voisin)) {
-                directedNodes.addAll(explorerSommet(voisin, nodeSet, visite, debut, fin));
-            }
-        }
-        visite[sommet.getLabel()] = 2;
-        fin[sommet.getLabel()] = compt++;
-        return directedNodes;
-    }
+	public static List<DirectedNode> explorerSommet(DirectedNode sommet, Set<DirectedNode> nodeSet, int[] visite,
+			int[] debut, int[] fin) {
+		nodeSet.add(sommet);
+		visite[sommet.getLabel()] = 1;
+		debut[sommet.getLabel()] = compt++;
+		List<DirectedNode> directedNodes = new ArrayList<>();
+		directedNodes.add(sommet);
+		for (DirectedNode voisin : sommet.getSuccs().keySet()) {
+			if (!nodeSet.contains(voisin)) {
+				directedNodes.addAll(explorerSommet(voisin, nodeSet, visite, debut, fin));
+			}
+		}
+		visite[sommet.getLabel()] = 2;
+		fin[sommet.getLabel()] = compt++;
+		return directedNodes;
+	}
 
-    //Depth First Search
-    public static int[][] explorerGraphe(DirectedGraph graph, List<DirectedNode> nodeList, boolean displayCFC) {
-        Set<DirectedNode> nodes = new HashSet<>();
-        int[] visite = new int[graph.getNbNodes()];
-        int[] debut = new int[graph.getNbNodes()];
-        int[] fin = new int[graph.getNbNodes()];
-        compt = 0;
-        for (DirectedNode directedNode : nodeList) {
-            if (!nodes.contains(directedNode)) {
-                if (displayCFC) {
-                    System.out.println("CFC:");
-                    System.out.println(explorerSommet(directedNode, nodes, visite, debut, fin));
-                } else {
-                    explorerSommet(directedNode, nodes, visite, debut, fin);
-                }
-            }
-        }
-        return new int[][]{debut, fin, visite};
-    }
+	// Depth First Search
+	public static int[][] explorerGraphe(DirectedGraph graph, List<DirectedNode> nodeList, boolean displayCFC) {
+		Set<DirectedNode> nodes = new HashSet<>();
+		int[] visite = new int[graph.getNbNodes()];
+		int[] debut = new int[graph.getNbNodes()];
+		int[] fin = new int[graph.getNbNodes()];
+		compt = 0;
+		for (DirectedNode directedNode : nodeList) {
+			if (!nodes.contains(directedNode)) {
+				if (displayCFC) {
+					System.out.println("CFC:");
+					System.out.println(explorerSommet(directedNode, nodes, visite, debut, fin));
+				} else {
+					explorerSommet(directedNode, nodes, visite, debut, fin);
+				}
+			}
+		}
+		return new int[][] { debut, fin, visite };
+	}
 
-    public static void BFS(DirectedNode node) {
-        Set<DirectedNode> marked = new HashSet<>();
-        LinkedList<DirectedNode> toVisit = new LinkedList<>();
-        toVisit.add(node);
-        marked.add(node);
-        while (!toVisit.isEmpty()) {
-            DirectedNode n = toVisit.removeFirst();
-            for (DirectedNode dn : n.getSuccs().keySet()) {
-                if (!marked.contains(dn)) {
-                    marked.add(dn);
-                    toVisit.add(dn);
-                }
-            }
-        }
-    }
+	public static void BFS(DirectedNode node) {
+		Set<DirectedNode> marked = new HashSet<>();
+		LinkedList<DirectedNode> toVisit = new LinkedList<>();
+		toVisit.add(node);
+		marked.add(node);
+		while (!toVisit.isEmpty()) {
+			DirectedNode n = toVisit.removeFirst();
+			for (DirectedNode dn : n.getSuccs().keySet()) {
+				if (!marked.contains(dn)) {
+					marked.add(dn);
+					toVisit.add(dn);
+				}
+			}
+		}
+	}
 
+	private static boolean areAllTrue(boolean[] array) {
+		for (boolean b : array)
+			if (!b)
+				return false;
+		return true;
+	}
 
-    private static boolean areAllTrue(boolean[] array) {
-        for (boolean b : array) if (!b) return false;
-        return true;
-    }
+	public static int[] dijkstra(DirectedValuedGraph directedValuedGraph, DirectedNode node) {
+		int n = directedValuedGraph.getNbNodes();
 
-    public static int[] dijkstra(DirectedValuedGraph directedValuedGraph, DirectedNode node) {
-        int n = directedValuedGraph.getNbNodes();
+		int[] d = new int[n];
+		int[] pred = new int[n];
+		boolean[] b = new boolean[n];
+		for (int i = 0; i < n; ++i) {
+			d[i] = INF;
+			b[i] = false;
+		}
+		d[node.getLabel()] = 0;
+		while (!areAllTrue(b)) {
+			int min = INF;
+			DirectedNode s = null;
+			for (DirectedNode no : directedValuedGraph.getNodes()) {
+				if (!b[no.getLabel()] && d[no.getLabel()] < min) {
+					min = d[no.getLabel()];
+					s = no;
+				}
+			}
+			if (min < INF) {
+				assert s != null;
+				b[s.getLabel()] = true;
+				for (DirectedNode s2 : s.getSuccs().keySet()) {
+					if (d[s2.getLabel()] > d[s.getLabel()] + s.getSuccs().get(s2)) {
+						d[s2.getLabel()] = d[s.getLabel()] + s.getSuccs().get(s2);
+						pred[s2.getLabel()] = s.getLabel();
+					}
+				}
+			} else {
+				return d;
+			}
+		}
+		return d;
+	}
 
-        int[] d = new int[n];
-        int[] pred = new int[n];
-        boolean[] b = new boolean[n];
-        for (int i = 0; i < n; ++i) {
-            d[i] = INF;
-            b[i] = false;
-        }
-        d[node.getLabel()] = 0;
-        while (!areAllTrue(b)) {
-            int min = INF;
-            DirectedNode s = null;
-            for (DirectedNode no : directedValuedGraph.getNodes()) {
-                if (!b[no.getLabel()] && d[no.getLabel()] < min) {
-                    min = d[no.getLabel()];
-                    s = no;
-                }
-            }
-            if (min < INF) {
-                assert s != null;
-                b[s.getLabel()] = true;
-                for (DirectedNode s2 : s.getSuccs().keySet()) {
-                    if (d[s2.getLabel()] > d[s.getLabel()] + s.getSuccs().get(s2)) {
-                        d[s2.getLabel()] = d[s.getLabel()] + s.getSuccs().get(s2);
-                        pred[s2.getLabel()] = s.getLabel();
-                    }
-                }
-            } else {
-                return d;
-            }
-        }
-        return d;
-    }
+	public static int[][] bellman(DirectedValuedGraph graph, DirectedNode s) {
+		int n = graph.getNbNodes();
+		int[][] dist = new int[n][n];
+		for (int i = 0; i < n; ++i) {
+			for (int j = 0; j < n; ++j) {
+				dist[i][j] = INF;
+			}
+		}
+		dist[0][s.getLabel()] = 0;
+		for (int k = 1; k < n; ++k) {
+			for (DirectedNode v : graph.getNodes()) {
+				for (DirectedNode x : v.getPreds().keySet()) {
+					int bestValue = Math.min(dist[k - 1][v.getLabel()], dist[k][v.getLabel()]);
+					if (dist[k - 1][x.getLabel()] != Integer.MAX_VALUE) {
+						dist[k][v.getLabel()] = Math.min(bestValue, dist[k - 1][x.getLabel()] + v.getPreds().get(x));
+					} else {
+						dist[k][v.getLabel()] = bestValue;
+					}
+				}
+			}
+		}
+		return dist;
+	}
 
-    public static int[][] bellman(DirectedValuedGraph graph, DirectedNode s) {
-        int n = graph.getNbNodes();
-        int[][] dist = new int[n][n];
-        for (int i = 0; i < n; ++i) {
-            for (int j = 0; j < n; ++j) {
-                dist[i][j] = INF;
-            }
-        }
-        dist[0][s.getLabel()] = 0;
-        for (int k = 1; k < n; ++k) {
-            for (DirectedNode v : graph.getNodes()) {
-                for (DirectedNode x : v.getPreds().keySet()) {
-                    int bestValue = Math.min(dist[k - 1][v.getLabel()], dist[k][v.getLabel()]);
-                    if (dist[k - 1][x.getLabel()] != Integer.MAX_VALUE) {
-                        dist[k][v.getLabel()] = Math.min(bestValue, dist[k - 1][x.getLabel()] + v.getPreds().get(x));
-                    } else {
-                        dist[k][v.getLabel()] = bestValue;
-                    }
-                }
-            }
-        }
-        return dist;
-    }
+	public static void CFC(DirectedGraph g) {
+		int[] fin = explorerGraphe(g, g.getNodes(), false)[1];
+		DirectedGraph inverse = g.computeInverse();
+		TreeMap<Integer, Integer> map = new TreeMap();
+		for (int i = 0; i < fin.length; ++i) {
+			map.put(fin[i], i);
+		}
+		List<Integer> finDecroissant = map.values().stream().collect(Collectors.toList());
+		Collections.reverse(finDecroissant);
+		List<DirectedNode> nodesInverse = finDecroissant.stream().map(i -> inverse.getNodeOfList(inverse.makeNode(i)))
+				.collect(Collectors.toList());
+		explorerGraphe(inverse, nodesInverse, true);
+	}
 
-
-    public static void CFC(DirectedGraph g) {
-        int[] fin = explorerGraphe(g, g.getNodes(), false)[1];
-        DirectedGraph inverse = g.computeInverse();
-        TreeMap<Integer, Integer> map = new TreeMap();
-        for (int i = 0; i < fin.length; ++i) {
-            map.put(fin[i], i);
-        }
-        List<Integer> finDecroissant = map.values().stream().collect(Collectors.toList());
-        Collections.reverse(finDecroissant);
-        List<DirectedNode> nodesInverse = finDecroissant.stream().map(i -> inverse.getNodeOfList(inverse.makeNode(i))).collect(Collectors.toList());
-        explorerGraphe(inverse, nodesInverse, true);
-    }
-
-    public static void main(String[] args) {
-        int[][] mat = generateGraphData(8, 14, false, false, false, 13);
+	public static void main(String[] args) {
+		int[][] mat = generateGraphData(8, 14, false, false, false, 13);
 		afficherMatrix(mat);
 		DirectedGraph g = new DirectedGraph(mat);
 		CFC(g);
 
+		// testPrim
+		// testPrim - Nodes creation
+		List<UndirectedNode> nodeList = new ArrayList<>();
+		nodeList.add(new UndirectedNode(1));
+		nodeList.add(new UndirectedNode(2));
+		nodeList.add(new UndirectedNode(3));
+		nodeList.add(new UndirectedNode(4));
+		nodeList.add(new UndirectedNode(5));
+		// testPrim - Edges creation
+		List<Triple<UndirectedNode, UndirectedNode, Integer>> edgeList = new ArrayList<>();
+		edgeList.add(new Triple<>(nodeList.get(1), nodeList.get(2), 1));
+		edgeList.add(new Triple<>(nodeList.get(2), nodeList.get(3), 1));
+		edgeList.add(new Triple<>(nodeList.get(2), nodeList.get(4), 2));
+		edgeList.add(new Triple<>(nodeList.get(2), nodeList.get(5), 2));
+		edgeList.add(new Triple<>(nodeList.get(3), nodeList.get(4), 1));
+		edgeList.add(new Triple<>(nodeList.get(4), nodeList.get(5), 1));
+		// testPrim - Graph
+		int num = 5;
+		int[][] matrix = new int[num][num];
+//		int[][] matrixVal = { 
+//				{ 0, 1, 0, 0, 0 },
+//				{ 1, 0, 1, 2, 2 },
+//				{ 0, 1, 0, 1, 0 },
+//				{ 0, 2, 1, 0, 1 },
+//				{ 0, 2, 0, 1, 0 }
+//				};		
+//		int[][] matrixValSup = { 
+//				{ 0, 1, 0, 0, 0 },
+//				{ 0, 0, 1, 2, 2 },
+//				{ 0, 0, 0, 1, 0 },
+//				{ 0, 0, 0, 0, 1 },
+//				{ 0, 0, 0, 0, 0 }
+//				};
+		UndirectedValuedGraph graph = new UndirectedValuedGraph(matrix);
+		for (Triple<UndirectedNode, UndirectedNode, Integer> edge : edgeList) {
+			graph.addEdge(edge.getFirst(), edge.getSecond(), edge.getThird());
+		}
+		// testPrim - Expected results
+		BinaryHeapEdge primExpected = new BinaryHeapEdge();
+		primExpected.insert(nodeList.get(1), nodeList.get(2), 1);
+		primExpected.insert(nodeList.get(2), nodeList.get(3), 1);
+		primExpected.insert(nodeList.get(2), nodeList.get(4), 2);
+		primExpected.insert(nodeList.get(2), nodeList.get(5), 2);
+		primExpected.insert(nodeList.get(3), nodeList.get(4), 1);
+		primExpected.insert(nodeList.get(4), nodeList.get(5), 1);
+		// testPrim - Observed results
+		List<Triple<UndirectedNode, UndirectedNode, Integer>> primResult = prim(graph);
+		// testPrim - Comparison
+		System.out.println(primExpected.getBinh().equals(primResult));
 	}
 
 }
