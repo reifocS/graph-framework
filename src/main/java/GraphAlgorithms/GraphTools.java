@@ -29,7 +29,7 @@ public class GraphTools {
 	}
 
 	// TODO
-	public List<Triple<UndirectedNode, UndirectedNode, Integer>> prim(UndirectedValuedGraph undirectedGraph) {
+	public static List<Triple<UndirectedNode, UndirectedNode, Integer>> prim(UndirectedValuedGraph undirectedGraph) {
 		List edges = new ArrayList();
 		List visitedNodes = new ArrayList();
 		BinaryHeapEdge binaryHeapEdge = new BinaryHeapEdge();
@@ -39,7 +39,7 @@ public class GraphTools {
 		return edges;
 	}
 
-	private void primIteration(UndirectedNode undirectedNode,
+	private static void primIteration(UndirectedNode undirectedNode,
 			List<Triple<UndirectedNode, UndirectedNode, Integer>> edges, BinaryHeapEdge binaryHeapEdge) {
 		List<Triple<UndirectedNode, UndirectedNode, Integer>> adj = getAllAdjacent(undirectedNode);
 		for (Triple<UndirectedNode, UndirectedNode, Integer> triple : adj) {
@@ -47,7 +47,7 @@ public class GraphTools {
 		}
 	}
 
-	private List<Triple<UndirectedNode, UndirectedNode, Integer>> getAllAdjacent(UndirectedNode undirectedNode) {
+	private static List<Triple<UndirectedNode, UndirectedNode, Integer>> getAllAdjacent(UndirectedNode undirectedNode) {
 		ArrayList<Triple<UndirectedNode, UndirectedNode, Integer>> adj = new ArrayList<>();
 		Map<UndirectedNode, Integer> ng = undirectedNode.getNeighbours();
 		for (Map.Entry<UndirectedNode, Integer> entry : ng.entrySet()) {
@@ -396,12 +396,61 @@ public class GraphTools {
 		explorerGraphe(inverse, nodesInverse, true);
 	}
 
-	public static void main(String[] args) {
-		int[][] mat = generateGraphData(8, 14, false, false, false, 13);
+    public static void main(String[] args) {
+        int[][] mat = generateGraphData(8, 14, false, false, false, 13);
 		afficherMatrix(mat);
 		DirectedGraph g = new DirectedGraph(mat);
 		CFC(g);
-
+		
+		//testPrim
+		//testPrim - Nodes creation
+		List<UndirectedNode> nodeList = new ArrayList<>();
+		nodeList.add(new UndirectedNode(1));
+		nodeList.add(new UndirectedNode(2));
+		nodeList.add(new UndirectedNode(3));
+		nodeList.add(new UndirectedNode(4));
+		nodeList.add(new UndirectedNode(5));
+		// testPrim - Edges creation
+		List<Triple<UndirectedNode, UndirectedNode, Integer>> edgeList = new ArrayList<>();
+		edgeList.add(new Triple<>(nodeList.get(1), nodeList.get(2), 1));
+		edgeList.add(new Triple<>(nodeList.get(2), nodeList.get(3), 1));
+		edgeList.add(new Triple<>(nodeList.get(2), nodeList.get(4), 2));
+		edgeList.add(new Triple<>(nodeList.get(2), nodeList.get(5), 2));
+		edgeList.add(new Triple<>(nodeList.get(3), nodeList.get(4), 1));
+		edgeList.add(new Triple<>(nodeList.get(4), nodeList.get(5), 1));
+		//testPrim - Graph
+	    int num = 5; 
+	    int[][] matrix = new int[num][num];
+//		int[][] matrixVal = { 
+//				{ 0, 1, 0, 0, 0 },
+//				{ 1, 0, 1, 2, 2 },
+//				{ 0, 1, 0, 1, 0 },
+//				{ 0, 2, 1, 0, 1 },
+//				{ 0, 2, 0, 1, 0 }
+//				};		
+//		int[][] matrixValSup = { 
+//				{ 0, 1, 0, 0, 0 },
+//				{ 0, 0, 1, 2, 2 },
+//				{ 0, 0, 0, 1, 0 },
+//				{ 0, 0, 0, 0, 1 },
+//				{ 0, 0, 0, 0, 0 }
+//				};
+		UndirectedValuedGraph graph = new UndirectedValuedGraph(matrix);
+		for (Triple<UndirectedNode, UndirectedNode, Integer> edge : edgeList) {
+			graph.addEdge(edge.getFirst(), edge.getSecond(), edge.getThird());
+		}
+		//testPrim - Expected results
+		BinaryHeapEdge primExpected = new BinaryHeapEdge();	
+		primExpected.insert(nodeList.get(1), nodeList.get(2), 1);
+		primExpected.insert(nodeList.get(2), nodeList.get(3), 1);
+		primExpected.insert(nodeList.get(2), nodeList.get(4), 2);
+		primExpected.insert(nodeList.get(2), nodeList.get(5), 2);
+		primExpected.insert(nodeList.get(3), nodeList.get(4), 1);
+		primExpected.insert(nodeList.get(4), nodeList.get(5), 1);
+		//testPrim - Observed results
+		List<Triple<UndirectedNode, UndirectedNode, Integer>> primResult = prim(graph);
+		//testPrim - Comparison
+		System.out.println(primExpected.getBinh().equals(primResult));		
 	}
 
 }
