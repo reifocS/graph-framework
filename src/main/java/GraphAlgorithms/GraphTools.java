@@ -28,30 +28,98 @@ public class GraphTools {
 
 	}
 
-	// TODO
-	public static List<Triple<UndirectedNode, UndirectedNode, Integer>> prim(UndirectedValuedGraph undirectedGraph) {
-		List edges = new ArrayList();
-		List visitedNodes = new ArrayList();
+	// TODO - minimumWeightSpanningTree
+	public static List<Triple<UndirectedNode, UndirectedNode, Integer>> prim(UndirectedValuedGraph graph) {
+		int startEdgePosition = 0; // to parameters if need
+		// Initialization
+		List<Triple<UndirectedNode, UndirectedNode, Integer>> edges = new ArrayList<Triple<UndirectedNode, UndirectedNode, Integer>>();
+		List<UndirectedNode> visitedNodes = new ArrayList<UndirectedNode>();
 		BinaryHeapEdge binaryHeapEdge = new BinaryHeapEdge();
-		List<UndirectedNode> nodes = undirectedGraph.getNodes();
-		primIteration(nodes.get(0), edges, binaryHeapEdge);
-		visitedNodes.add(nodes.get(0));
+		List<UndirectedNode> nodes = graph.getNodes();
+		// n=1
+		UndirectedNode startNode = nodes.get(startEdgePosition);
+		Triple<UndirectedNode, UndirectedNode, Integer> startEdge = getBestEdge(startNode,
+				new ArrayList<UndirectedNode>());
+		binaryHeapEdge.insert(startEdge.getFirst(), startEdge.getSecond(), startEdge.getThird());
+		// n+1
+		try {
+			for (UndirectedNode undirectedNode : nodes) {
+				Triple<UndirectedNode, UndirectedNode, Integer> edge = getBestEdge(binaryHeapEdge);
+				binaryHeapEdge.insert(edge.getFirst(), edge.getSecond(), edge.getThird());
+				visitedNodes.add(nodes.get(0));
+			}
+		} catch (Exception e) {
+			if (e.getMessage() == "No adjancent nodes available" && visitedNodes.size() < graph.getNbNodes()) {
+				System.out.println("Not a connex graph");
+			}
+		}
+		// result
 		return edges;
 	}
 
-	private static void primIteration(UndirectedNode undirectedNode,
-			List<Triple<UndirectedNode, UndirectedNode, Integer>> edges, BinaryHeapEdge binaryHeapEdge) {
-		List<Triple<UndirectedNode, UndirectedNode, Integer>> adj = getAllAdjacent(undirectedNode);
-		for (Triple<UndirectedNode, UndirectedNode, Integer> triple : adj) {
-			binaryHeapEdge.insert(triple.getFirst(), triple.getSecond(), triple.getThird());
-		}
+	/**
+	 * TODO To get the best available edge for ALL visited node
+	 * 
+	 * @param bhe
+	 * @return
+	 */
+	private static Triple<UndirectedNode, UndirectedNode, Integer> getBestEdge(BinaryHeapEdge bhe) {
+		// here I use getBinh but I think it should not be the case as I was not
+		// implemented and as I do not take profit of the bhe structure
+		// TODO Erase
+//    	Triple<UndirectedNode, UndirectedNode, Integer> edgeChosen = bhe.getBinh().get(0);
+//    	for (Triple<UndirectedNode, UndirectedNode, Integer> iterable_element : bhe.getBinh()) {
+//    		Triple<UndirectedNode, UndirectedNode, Integer> edgeCandidate = getBestEdge(iterable_element.getFirst(), bhe.getBinh()); // not bhe.getBinh()
+//    		if(edgeCandidate.getThird() < edgeChosen.getThird()) {
+//    			edgeChosen = iterable_element;
+//    		}
+//		}
+//    	return edgeChosen;
+		return null;
 	}
 
-	private static List<Triple<UndirectedNode, UndirectedNode, Integer>> getAllAdjacent(UndirectedNode undirectedNode) {
+	/**
+	 * To get the best available edge from ONE node
+	 * 
+	 * @param evaluatedNode
+	 * @param visitedNodes
+	 * @return
+	 */
+	private static Triple<UndirectedNode, UndirectedNode, Integer> getBestEdge(UndirectedNode evaluatedNode,
+			List<UndirectedNode> visitedNodes) {
+		List<Triple<UndirectedNode, UndirectedNode, Integer>> adj = getAllAdjacent(evaluatedNode);
+		// select all adjacent nodes which will not produce a cycle
+		List<Triple<UndirectedNode, UndirectedNode, Integer>> adjSelect = null;
+		for (Triple<UndirectedNode, UndirectedNode, Integer> triple : adj) {
+			if (!(visitedNodes.contains(triple.getFirst()) || visitedNodes.contains(triple.getSecond()))) {
+				adjSelect.add(new Triple<UndirectedNode, UndirectedNode, Integer>(triple.getFirst(), triple.getSecond(),
+						triple.getThird()));
+			}
+		}
+		if (adjSelect.size() <= 0) {
+			throw new Error("No adjancent nodes available");
+		}
+		// select the nearest adjacent node
+		Triple<UndirectedNode, UndirectedNode, Integer> edgeChosen = adjSelect.get(0);
+		for (Triple<UndirectedNode, UndirectedNode, Integer> triple : adjSelect) {
+			if (triple.getThird() < edgeChosen.getThird()) {
+				edgeChosen = triple;
+			}
+		}
+		// return the nearest adjacent node which does not produce any cycle
+		return edgeChosen;
+	}
+
+	/**
+	 * 
+	 * @param evaluatedNode
+	 * @return
+	 */
+	private static List<Triple<UndirectedNode, UndirectedNode, Integer>> getAllAdjacent(UndirectedNode evaluatedNode) {
 		ArrayList<Triple<UndirectedNode, UndirectedNode, Integer>> adj = new ArrayList<>();
-		Map<UndirectedNode, Integer> ng = undirectedNode.getNeighbours();
+		Map<UndirectedNode, Integer> ng = evaluatedNode.getNeighbours();
 		for (Map.Entry<UndirectedNode, Integer> entry : ng.entrySet()) {
-			adj.add(new Triple<>(undirectedNode, entry.getKey(), entry.getValue()));
+			adj.add(new Triple<>(evaluatedNode, entry.getKey(), entry.getValue()));
 		}
 		return adj;
 	}
@@ -396,14 +464,14 @@ public class GraphTools {
 		explorerGraphe(inverse, nodesInverse, true);
 	}
 
-    public static void main(String[] args) {
-        int[][] mat = generateGraphData(8, 14, false, false, false, 13);
+	public static void main(String[] args) {
+		int[][] mat = generateGraphData(8, 14, false, false, false, 13);
 		afficherMatrix(mat);
 		DirectedGraph g = new DirectedGraph(mat);
 		CFC(g);
-		
-		//testPrim
-		//testPrim - Nodes creation
+
+		// testPrim
+		// testPrim - Nodes creation
 		List<UndirectedNode> nodeList = new ArrayList<>();
 		nodeList.add(new UndirectedNode(1));
 		nodeList.add(new UndirectedNode(2));
@@ -418,9 +486,9 @@ public class GraphTools {
 		edgeList.add(new Triple<>(nodeList.get(2), nodeList.get(5), 2));
 		edgeList.add(new Triple<>(nodeList.get(3), nodeList.get(4), 1));
 		edgeList.add(new Triple<>(nodeList.get(4), nodeList.get(5), 1));
-		//testPrim - Graph
-	    int num = 5; 
-	    int[][] matrix = new int[num][num];
+		// testPrim - Graph
+		int num = 5;
+		int[][] matrix = new int[num][num];
 //		int[][] matrixVal = { 
 //				{ 0, 1, 0, 0, 0 },
 //				{ 1, 0, 1, 2, 2 },
@@ -439,18 +507,18 @@ public class GraphTools {
 		for (Triple<UndirectedNode, UndirectedNode, Integer> edge : edgeList) {
 			graph.addEdge(edge.getFirst(), edge.getSecond(), edge.getThird());
 		}
-		//testPrim - Expected results
-		BinaryHeapEdge primExpected = new BinaryHeapEdge();	
+		// testPrim - Expected results
+		BinaryHeapEdge primExpected = new BinaryHeapEdge();
 		primExpected.insert(nodeList.get(1), nodeList.get(2), 1);
 		primExpected.insert(nodeList.get(2), nodeList.get(3), 1);
 		primExpected.insert(nodeList.get(2), nodeList.get(4), 2);
 		primExpected.insert(nodeList.get(2), nodeList.get(5), 2);
 		primExpected.insert(nodeList.get(3), nodeList.get(4), 1);
 		primExpected.insert(nodeList.get(4), nodeList.get(5), 1);
-		//testPrim - Observed results
+		// testPrim - Observed results
 		List<Triple<UndirectedNode, UndirectedNode, Integer>> primResult = prim(graph);
-		//testPrim - Comparison
-		System.out.println(primExpected.getBinh().equals(primResult));		
+		// testPrim - Comparison
+		System.out.println(primExpected.getBinh().equals(primResult));
 	}
 
 }
