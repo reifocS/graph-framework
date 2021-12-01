@@ -12,251 +12,266 @@ import java.util.stream.Collectors;
 
 public class GraphTools {
 
-	private static int _DEBBUG = 0;
-	private static int INF = Integer.MAX_VALUE;
+    private static int _DEBBUG = 0;
+    private static int INF = Integer.MAX_VALUE;
     private static int compt = 0;
 
-	public GraphTools() {
+    public GraphTools() {
 
-	}
-
-
-    // TODO
-    public List<Triple<UndirectedNode, UndirectedNode, Integer>> prim(UndirectedValuedGraph undirectedGraph) {
-        List edges = new ArrayList();
-        List visitedNodes = new ArrayList();
-        BinaryHeapEdge binaryHeapEdge = new BinaryHeapEdge();
-        List<UndirectedNode> nodes = undirectedGraph.getNodes();
-        primIteration(nodes.get(0), edges, binaryHeapEdge);
-        visitedNodes.add(nodes.get(0));
-        return edges;
-	}
-
-	private void primIteration(UndirectedNode undirectedNode,
-			List<Triple<UndirectedNode, UndirectedNode, Integer>> edges, BinaryHeapEdge binaryHeapEdge) {
-		List<Triple<UndirectedNode, UndirectedNode, Integer>> adj = getAllAdjacent(undirectedNode);
-		for (Triple<UndirectedNode, UndirectedNode, Integer> triple : adj) {
-			binaryHeapEdge.insert(triple.getFirst(), triple.getSecond(), triple.getThird());
-		}
-	}
-
-
-    private List<Triple<UndirectedNode, UndirectedNode, Integer>> getAllAdjacent(UndirectedNode undirectedNode) {
-        ArrayList<Triple<UndirectedNode, UndirectedNode, Integer>> adj = new ArrayList<>();
-        Map<UndirectedNode, Integer> ng = undirectedNode.getNeighbours();
-        for (Map.Entry<UndirectedNode, Integer> entry : ng.entrySet()) {
-            adj.add(new Triple<>(undirectedNode, entry.getKey(), entry.getValue()));
-        }
-        return adj;
     }
 
-	/**
-	 * @param n,     the number of vertices
-	 * @param multi, at true if we want a multi-graph
-	 * @param s,     at true if the graph is symmetric
-	 * @param c,     at true if the graph is connected
-	 * @param seed,  the unique seed giving a unique random graph
-	 * @return the generated matrix
-	 */
-	public static int[][] generateGraphData(int n, boolean multi, boolean s, boolean c, int seed) {
-		if (_DEBBUG > 0) {
-			System.out.println("\n ------------------------------------------------");
-			System.out.println("<< Lancement de la méthode generateGraphData en aléatoire complet>>");
-		}
+    public static int findMinIndex(final List<Triple<UndirectedNode, UndirectedNode, Integer>> xs) {
+        int minIndex;
+        if (xs.isEmpty()) {
+            minIndex = -1;
+        } else {
+            final ListIterator<Triple<UndirectedNode, UndirectedNode, Integer>> itr = xs.listIterator();
+            Triple<UndirectedNode, UndirectedNode, Integer> min = itr.next(); // first element as the current minimum
+            minIndex = itr.previousIndex();
+            while (itr.hasNext()) {
+                final Triple<UndirectedNode, UndirectedNode, Integer> curr = itr.next();
+                if (curr.getThird() < min.getThird()) {
+                    min = curr;
+                    minIndex = itr.previousIndex();
+                }
+            }
+        }
+        return minIndex;
+    }
 
-		Random rand = new Random(seed);
-		int m = (rand.nextInt(n) + 1) * (n - 1) / 2;
-		if (_DEBBUG > 0) {
-			System.out.println("m = " + m);
-		}
-		int[][] matrix = new int[n][n];
-		if (c) {
-			List<Integer> vis = new ArrayList<>();
-			int from = rand.nextInt(n);
-			vis.add(from);
-			from = rand.nextInt(n);
-			while (vis.size() < n) {
-				if (!vis.contains(from)) {
-					int indDest = rand.nextInt(vis.size());
-					int dest = vis.get(indDest);
-					if (s) {
-						matrix[dest][from] = 1;
-					}
-					matrix[from][dest] = 1;
-					vis.add(from);
-				}
-				from = rand.nextInt(n);
-			}
-			m -= n - 1;
-		}
+    public static BinaryHeapEdge prim(UndirectedValuedGraph undirectedGraph) {
+        List visitedNodes = new ArrayList();
+        List<Triple<UndirectedNode, UndirectedNode, Integer>> edges = new ArrayList();
+        BinaryHeapEdge binaryHeapEdge = new BinaryHeapEdge();
+        List<UndirectedNode> nodes = undirectedGraph.getNodes();
+        UndirectedNode root = nodes.get(0);
+        visitedNodes.add(root);
+        for (Map.Entry<UndirectedNode, Integer> neighbour : root.getNeighbours().entrySet()) {
+            edges.add(new Triple<>(root, neighbour.getKey(), neighbour.getValue()));
+        }
 
-		while (m > 0) {
-			int i = rand.nextInt(n);
-			int j = rand.nextInt(n);
-			if (_DEBBUG > 0) {
-				System.out.println("i = " + i);
-				System.out.println("j = " + j);
-			}
-			if (!multi) {
-				if (i != j && matrix[i][j] != 1) {
-					if (s) {
-						matrix[j][i] = 1;
-					}
-					matrix[i][j] = 1;
-					m--;
-				}
-			} else {
-				if (matrix[i][j] == 0) {
-					int val = (i != j ? (m < 3 ? m : rand.nextInt(3) + 1) : 1);
-					if (_DEBBUG > 0) {
-						System.out.println("Pour multi, val = " + val);
-					}
-					if (s) {
-						matrix[j][i] = val;
-					}
-					matrix[i][j] = val;
-					m -= val;
-				}
-			}
-		}
-		return matrix;
-	}
+        while (!edges.isEmpty()) {
+            Triple<UndirectedNode, UndirectedNode, Integer> min = edges.get(findMinIndex(edges));
+            edges.remove(min);
+            if (!visitedNodes.contains(min.getFirst()) || !visitedNodes.contains(min.getSecond())) {
+                visitedNodes.add(min.getSecond());
+                binaryHeapEdge.insert(min.getFirst(), min.getSecond(), min.getThird());
+                for (Map.Entry<UndirectedNode, Integer> neighbour : min.getSecond().getNeighbours().entrySet()) {
+                    edges.add(new Triple<>(min.getSecond(), neighbour.getKey(), neighbour.getValue()));
+                }
+            }
+        }
 
-	/**
-	 * @param n,     the number of vertices
-	 * @param m,     the number of edges
-	 * @param multi, at true if we want a multi-graph
-	 * @param s,     at true if the graph is symmetric
-	 * @param c,     at true if the graph is connexted
-	 * @param seed,  the unique seed giving a unique random graph
-	 * @return the generated matrix
-	 */
-	public static int[][] generateGraphData(int n, int m, boolean multi, boolean s, boolean c, int seed) {
-		if (_DEBBUG > 0) {
-			System.out.println("\n ------------------------------------------------");
-			System.out.println("<< Lancement de la méthode generateGraphData >>");
-		}
-		int[][] matrix = new int[n][n];
-		Random rand = new Random(seed);
-		if (c) {
-			List<Integer> vis = new ArrayList<>();
-			int from = rand.nextInt(n);
-			vis.add(from);
-			from = rand.nextInt(n);
-			while (vis.size() < n) {
-				if (!vis.contains(from)) {
-					int indDest = rand.nextInt(vis.size());
-					int dest = vis.get(indDest);
-					if (s) {
-						matrix[dest][from] = 1;
-					}
-					matrix[from][dest] = 1;
-					vis.add(from);
-				}
-				from = rand.nextInt(n);
-			}
-			m -= n - 1;
-		}
+        return binaryHeapEdge;
+    }
 
-		while (m > 0) {
-			int i = rand.nextInt(n);
-			int j = rand.nextInt(n);
-			if (_DEBBUG > 0) {
-				System.out.println("i = " + i);
-				System.out.println("j = " + j);
-			}
-			if (!multi) {
-				if (i != j && matrix[i][j] != 1) {
-					if (s) {
-						matrix[j][i] = 1;
-					}
-					matrix[i][j] = 1;
-					m--;
-				}
-			} else {
-				if (matrix[i][j] == 0) {
-					int val = (i != j ? (m < 3 ? m : rand.nextInt(3) + 1) : 1);
-					if (_DEBBUG > 0) {
-						System.out.println("Pour multi, val = " + val);
-					}
-					if (s) {
-						matrix[j][i] = val;
-					}
-					matrix[i][j] = val;
-					m -= val;
-				}
-			}
-		}
-		return matrix;
-	}
+    /**
+     * @param n,     the number of vertices
+     * @param multi, at true if we want a multi-graph
+     * @param s,     at true if the graph is symmetric
+     * @param c,     at true if the graph is connected
+     * @param seed,  the unique seed giving a unique random graph
+     * @return the generated matrix
+     */
+    public static int[][] generateGraphData(int n, boolean multi, boolean s, boolean c, int seed) {
+        if (_DEBBUG > 0) {
+            System.out.println("\n ------------------------------------------------");
+            System.out.println("<< Lancement de la méthode generateGraphData en aléatoire complet>>");
+        }
 
-	/**
-	 * @param n,     the number of vertices
-	 * @param multi, at true if we want a multi-graph
-	 * @param s,     at true if the graph is symmetric
-	 * @param c,     at true if the graph is connexted
-	 * @param neg,   at true if the graph has negative weights
-	 * @param seed,  the unique seed giving a unique random graph
-	 */
-	public static int[][] generateValuedGraphData(int n, boolean multi, boolean s, boolean c, boolean neg, int seed) {
-		if (_DEBBUG > 0) {
-			System.out.println("\n ------------------------------------------------");
-			System.out.println("<< Lancement de la méthode generateValuedGraphData >>");
-		}
+        Random rand = new Random(seed);
+        int m = (rand.nextInt(n) + 1) * (n - 1) / 2;
+        if (_DEBBUG > 0) {
+            System.out.println("m = " + m);
+        }
+        int[][] matrix = new int[n][n];
+        if (c) {
+            List<Integer> vis = new ArrayList<>();
+            int from = rand.nextInt(n);
+            vis.add(from);
+            from = rand.nextInt(n);
+            while (vis.size() < n) {
+                if (!vis.contains(from)) {
+                    int indDest = rand.nextInt(vis.size());
+                    int dest = vis.get(indDest);
+                    if (s) {
+                        matrix[dest][from] = 1;
+                    }
+                    matrix[from][dest] = 1;
+                    vis.add(from);
+                }
+                from = rand.nextInt(n);
+            }
+            m -= n - 1;
+        }
 
-		int[][] mat = generateGraphData(n, multi, s, c, seed);
-		int[][] matValued = new int[mat.length][mat.length];
-		Random rand = new Random(seed);
-		int valNeg = 0;
-		if (neg) {
-			valNeg = -6;
-		}
+        while (m > 0) {
+            int i = rand.nextInt(n);
+            int j = rand.nextInt(n);
+            if (_DEBBUG > 0) {
+                System.out.println("i = " + i);
+                System.out.println("j = " + j);
+            }
+            if (!multi) {
+                if (i != j && matrix[i][j] != 1) {
+                    if (s) {
+                        matrix[j][i] = 1;
+                    }
+                    matrix[i][j] = 1;
+                    m--;
+                }
+            } else {
+                if (matrix[i][j] == 0) {
+                    int val = (i != j ? (m < 3 ? m : rand.nextInt(3) + 1) : 1);
+                    if (_DEBBUG > 0) {
+                        System.out.println("Pour multi, val = " + val);
+                    }
+                    if (s) {
+                        matrix[j][i] = val;
+                    }
+                    matrix[i][j] = val;
+                    m -= val;
+                }
+            }
+        }
+        return matrix;
+    }
 
-		for (int i = 0; i < mat.length; i++) {
-			for (int j = 0; j < mat[0].length; j++) {
-				if (mat[i][j] > 0) {
-					int val = rand.nextInt(15) + 1 + valNeg;
-					matValued[i][j] = val;
-					if (s) {
-						matValued[j][i] = val;
-					}
-				}
-			}
-		}
+    /**
+     * @param n,     the number of vertices
+     * @param m,     the number of edges
+     * @param multi, at true if we want a multi-graph
+     * @param s,     at true if the graph is symmetric
+     * @param c,     at true if the graph is connexted
+     * @param seed,  the unique seed giving a unique random graph
+     * @return the generated matrix
+     */
+    public static int[][] generateGraphData(int n, int m, boolean multi, boolean s, boolean c, int seed) {
+        if (_DEBBUG > 0) {
+            System.out.println("\n ------------------------------------------------");
+            System.out.println("<< Lancement de la méthode generateGraphData >>");
+        }
+        int[][] matrix = new int[n][n];
+        Random rand = new Random(seed);
+        if (c) {
+            List<Integer> vis = new ArrayList<>();
+            int from = rand.nextInt(n);
+            vis.add(from);
+            from = rand.nextInt(n);
+            while (vis.size() < n) {
+                if (!vis.contains(from)) {
+                    int indDest = rand.nextInt(vis.size());
+                    int dest = vis.get(indDest);
+                    if (s) {
+                        matrix[dest][from] = 1;
+                    }
+                    matrix[from][dest] = 1;
+                    vis.add(from);
+                }
+                from = rand.nextInt(n);
+            }
+            m -= n - 1;
+        }
 
-		return matValued;
-	}
+        while (m > 0) {
+            int i = rand.nextInt(n);
+            int j = rand.nextInt(n);
+            if (_DEBBUG > 0) {
+                System.out.println("i = " + i);
+                System.out.println("j = " + j);
+            }
+            if (!multi) {
+                if (i != j && matrix[i][j] != 1) {
+                    if (s) {
+                        matrix[j][i] = 1;
+                    }
+                    matrix[i][j] = 1;
+                    m--;
+                }
+            } else {
+                if (matrix[i][j] == 0) {
+                    int val = (i != j ? (m < 3 ? m : rand.nextInt(3) + 1) : 1);
+                    if (_DEBBUG > 0) {
+                        System.out.println("Pour multi, val = " + val);
+                    }
+                    if (s) {
+                        matrix[j][i] = val;
+                    }
+                    matrix[i][j] = val;
+                    m -= val;
+                }
+            }
+        }
+        return matrix;
+    }
 
-	/**
-	 * @param m a matrix
-	 */
-	public static void afficherMatrix(int[][] m) {
-		for (int[] line : m) {
-			for (int v : line) {
-				System.out.print(v + " ");
-			}
-			System.out.println();
-		}
-		System.out.println();
-	}
+    /**
+     * @param n,     the number of vertices
+     * @param multi, at true if we want a multi-graph
+     * @param s,     at true if the graph is symmetric
+     * @param c,     at true if the graph is connexted
+     * @param neg,   at true if the graph has negative weights
+     * @param seed,  the unique seed giving a unique random graph
+     */
+    public static int[][] generateValuedGraphData(int n, boolean multi, boolean s, boolean c, boolean neg, int seed) {
+        if (_DEBBUG > 0) {
+            System.out.println("\n ------------------------------------------------");
+            System.out.println("<< Lancement de la méthode generateValuedGraphData >>");
+        }
 
-	/**
-	 * @param mat, a matrix
-	 * @return the symmetrical matrix
-	 */
-	public static int[][] matrixSym(int[][] mat) {
-		for (int i = 0; i < mat.length; i++) {
-			for (int j = 0; j < mat[i].length; j++) {
-				if (mat[i][j] == 1) {
-					mat[j][i] = 1;
-				}
-				mat[i][j] = 0;
-			}
-		}
-		return mat;
-	}
+        int[][] mat = generateGraphData(n, multi, s, c, seed);
+        int[][] matValued = new int[mat.length][mat.length];
+        Random rand = new Random(seed);
+        int valNeg = 0;
+        if (neg) {
+            valNeg = -6;
+        }
 
-	public static List<DirectedNode> explorerSommet(DirectedNode sommet, Set<DirectedNode> nodeSet, int[] visite, int[] debut, int[] fin) {
+        for (int i = 0; i < mat.length; i++) {
+            for (int j = 0; j < mat[0].length; j++) {
+                if (mat[i][j] > 0) {
+                    int val = rand.nextInt(15) + 1 + valNeg;
+                    matValued[i][j] = val;
+                    if (s) {
+                        matValued[j][i] = val;
+                    }
+                }
+            }
+        }
+
+        return matValued;
+    }
+
+    /**
+     * @param m a matrix
+     */
+    public static void afficherMatrix(int[][] m) {
+        for (int[] line : m) {
+            for (int v : line) {
+                System.out.print(v + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
+    /**
+     * @param mat, a matrix
+     * @return the symmetrical matrix
+     */
+    public static int[][] matrixSym(int[][] mat) {
+        for (int i = 0; i < mat.length; i++) {
+            for (int j = 0; j < mat[i].length; j++) {
+                if (mat[i][j] == 1) {
+                    mat[j][i] = 1;
+                }
+                mat[i][j] = 0;
+            }
+        }
+        return mat;
+    }
+
+    public static List<DirectedNode> explorerSommet(DirectedNode sommet, Set<DirectedNode> nodeSet, int[] visite, int[] debut, int[] fin) {
         nodeSet.add(sommet);
         visite[sommet.getLabel()] = 1;
         debut[sommet.getLabel()] = compt++;
@@ -390,10 +405,15 @@ public class GraphTools {
 
     public static void main(String[] args) {
         int[][] mat = generateGraphData(8, 14, false, false, false, 13);
-		afficherMatrix(mat);
-		DirectedGraph g = new DirectedGraph(mat);
-		CFC(g);
-
-	}
+        afficherMatrix(mat);
+        DirectedGraph g = new DirectedGraph(mat);
+        CFC(g);
+        int[][] mat2 = generateGraphData(8, 14, false, true, true, 13);
+        afficherMatrix(mat2);
+        UndirectedValuedGraph graph = new UndirectedValuedGraph(mat2);
+        BinaryHeapEdge primResult = prim(graph);
+        System.out.println("PRIM");
+        primResult.lovelyPrinting();
+    }
 
 }
